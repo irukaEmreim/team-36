@@ -52,8 +52,7 @@ CROWEL: Grudge Has Wings, bir 3D stealth-strategy aksiyon oyunu olarak oyuncular
 ## [HEDEF KİTLESİ]
 + bağımsız (indie) oyun severler 
 + hayvan protagonist severler
-+ hafıza ve dikkat mekaniği severler
-+ intikam teması severler
++ strateji ve intikam teması severler
 + 13 yaş ve üzeri
 
 ## [BACKLOG URL]
