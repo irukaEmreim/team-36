@@ -7,34 +7,48 @@
 | Yunus Emre Akyay | Developer |
 | Elif Duzcan | Developer |
 | Umut Başar | Developer |
-| Beste Bozkurt | Developer |
+| Beste Bozkurt | Scrum Master, Product Owner |
 
 
 <br><br>
 
-# OYUN TASARISI (PROPOSAL)
+# OYUN TASARISI (PROPOSAL) 
 ## [OYUNUN ADI] CROWEL: Grudge Has Wings
 ## [PROLOGUE]
+
 Kargalar asla unutmaz. 
-Unutulmuş bir hakaretin yankısı, 
-kanatlı bir kin olarak yaşar 
-ve nihayetinde sana intikam olarak geri döner. 
-Kalabalıkların arasında 
-seni görür, 
-seni tanır, 
-ve hep seni bulur. 
-O seni bulduğunda ise yapabileceğin tek şey...
+<br>
+Kaybedilmiş bir yuvanın yankısı, 
+<br>
+Kanatlı bir kin olarak yaşar 
+<br>
+Ve nihayetinde sana intikam olarak geri döner. 
+<br>
+<br>
+Kargalar asla unutmaz, ama bekler.
+<br>
+Doğru anı, doğru fırsatı…
+<br>
+Ve hiç beklemediğin bir anda,
+<br>
+Seninle tekrar yüzleşecektir.
+<br>
+O seni bulduğunda ise yapabileceğin tek şey…
+<br>
 Kaçabildiğin kadar uzağa kaçmaktır.
+
+## PROPOSAL LINK 
+https://docs.google.com/document/d/1wEjlsZ3QrWh5ra1cclZY_XKK97Q9MIzxCxA_48bxnAU/edit?usp=sharing
 
 ## [OYUN AÇIKLAMASI]
 
-CROWEL: Grudge Has Wings, hafıza, gizlilik ve taktiksel aksiyonu bir araya getiren hikaye odaklı bir 3D stealth action puzzle oyunudur. Oyuncular, kurnaz bir karganın gözünden, ona sataşan düşmanlarından intikam almaya çalışırlar. Düşmanlarının stres seviyelerini artırmak için gaklar, taş atar ve belirli tuzaklarla etkileşime geçerler. Aynı zamanda düşmanların ve çevredeki diğer insanların muhtemel saldırılarını savuşturmalıdırlar. Oyunun atmosferi, bulmacaları ve mekanikleri oyuncuları gözlem yapmaya ve stratejik saldırılar planlamaya teşvik eder. 
+CROWEL: Grudge Has Wings, bir 3D stealth-strategy aksiyon oyunu olarak oyuncularını otel uğruna yuvası tahrip edilmiş bir karganın eşsiz intikam macerasına davet eder. Uğruna evinizin yok edildiği bu otelde kimseyi barındırmamak, stratejik saldırılar ve tuzaklar planlayarak kısıtlı sürede herkesin tatilini berbat edip otelden kaçırmak temel amacınızdır.
 
 ## [OYUN ÖZELLİKLERİ]
 + 3D
++ stealth-strategy aksiyon
 + Tek oyunculu
 + Low-poly
-+ Stratejik saldırı
 ## [HEDEF KİTLESİ]
 + bağımsız (indie) oyun severler 
 + hayvan protagonist severler
@@ -43,6 +57,7 @@ CROWEL: Grudge Has Wings, hafıza, gizlilik ve taktiksel aksiyonu bir araya geti
 + 13 yaş ve üzeri
 
 ## [BACKLOG URL]
+https://miro.com/app/board/uXjVIjIWxhI=/
 
 <br><br>
 
