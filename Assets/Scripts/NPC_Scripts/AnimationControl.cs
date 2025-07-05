@@ -1,176 +1,102 @@
 using UnityEngine;
 using UnityEngine.AI;
-using System.Linq;
 
 public class AnimationControl : MonoBehaviour
 {
     public float roamRadius = 10f;
-    public float minActionTime = 6f;
-    public float maxActionTime = 9f;
-    [HideInInspector]
-    public bool isExternallyControlled = false;
-
+    public float actionDuration = 5f;
 
     private NavMeshAgent agent;
     private Animator animator;
+    [HideInInspector]
+    public bool isExternallyControlled = false;
 
-    private float waitTimer = 0f;
-    private bool isWaiting = false;
-    private string currentAction = "";
+    private enum ActionPhase { Walk, Dance, SelfCheck }
+    private ActionPhase currentPhase = ActionPhase.Walk;
 
-    private string[] idleActions = { "DoDance", "DoDance2", "DoExercise", "DoSelfCheck", "DoPhoneTalk" };
-    private string[] movementActions = { "isPhoneWalking",  };
+    private float timer = 0f;
+    private bool isActing = false;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        
-        
 
-        agent.ResetPath(); // 🔒 Hedef sıfırla
-        agent.velocity = Vector3.zero; // ⛔ Başlangıç kaymasını durdur
-
-        PlayRandomAction(); // ilk aksiyon başlat
+        StartNextAction();
     }
-
 
     void Update()
     {
-        float speed = agent.velocity.magnitude;
-        bool isMoving = speed > 0.1f;
+        if (!isActing)
+            return;
 
-        // Normal yürüme animasyonu
-        animator.SetBool("isWalking", isMoving && currentAction == "isWalking" && !isExternallyControlled);
+        timer -= Time.deltaTime;
 
-
-
-        // Eğer KOŞUYORSA ve hedefi bittiyse → yeni nokta ver
-        if (animator.GetBool("isRunning") && (!agent.hasPath || agent.remainingDistance < 0.5f))
+        if (currentPhase == ActionPhase.Walk && (!agent.hasPath || agent.remainingDistance < 0.5f))
         {
-            agent.speed = 4.5f; // Koşma hızı
-            MoveToRandomPoint();
+            agent.ResetPath();
+            animator.SetBool("isWalking", false);
         }
 
-        // Eğer yürüyorsa ama koşmuyorsa (normal yürüyüş)
-        if (animator.GetBool("isWalking") && (!agent.hasPath || agent.remainingDistance < 0.5f))
+        if (timer <= 0f)
         {
-            agent.speed = 1.5f;
-            MoveToRandomPoint();
-        }
-        
-        // Eğer hedefe ulaştıysa ve beklemiyorsa, yeni animasyon başlat
-        if (!isWaiting)
-        {
-            isWaiting = true;
-            PlayRandomAction();
-        }
-
-        // Sabit animasyon süresi dolduysa → yeni aksiyona geç
-        if (isWaiting)
-        {
-            waitTimer -= Time.deltaTime;
-
-            if (waitTimer <= 0f && currentAction != "")
-            {
-                ResetAllBools(); // 🔴 tüm animasyonları temizle
-                animator.SetBool(currentAction, false); // ekstra güvenlik
-                currentAction = "";
-
-                agent.ResetPath();
-                isWaiting = false;
-            }
-
-        }
-
-    }
-
-
-    void PlayRandomAction()
-    {
-        ResetAllBools();     // tüm bool animasyonları sıfırla
-        currentAction = "";  // aktif aksiyonu boşalt
-
-
-        int type = Random.Range(0, 2); // 0 = idle action, 1 = phone walk, 2 = run
-
-        if (type == 0) // Sabit animasyon
-        {
-            currentAction = idleActions[Random.Range(0, idleActions.Length)];
-            animator.SetBool(currentAction, true);
-            waitTimer = Random.Range(minActionTime, maxActionTime);
-
-            agent.ResetPath(); // ⛔ durdur
-            agent.velocity = Vector3.zero; // 🛑 kaymayı engelle
-
-            Debug.Log("🎬 Yeni aksiyon başladı: " + currentAction);
-        }
-
-        else if (type == 1) // Telefonla yürüme
-        {
-            currentAction = "isPhoneWalking";
-            animator.SetBool(currentAction, true);
-            agent.speed = 1.5f;
-            MoveToRandomPoint();
-            waitTimer = Random.Range(minActionTime, maxActionTime);
-            Debug.Log("🎬 Yeni aksiyon başladı: " + currentAction);
-
-        }
-        else // Koşma
-        {
-            currentAction = "isRunning";
-            animator.SetBool(currentAction, true);
-            agent.speed = 4.5f;
-            MoveToRandomPoint();
-            waitTimer = Random.Range(minActionTime, maxActionTime);
-            Debug.Log("🎬 Yeni aksiyon başladı: " + currentAction);
-
+            EndCurrentAction();
+            MoveToNextPhase();
+            StartNextAction();
         }
     }
 
-    void MoveToRandomPoint()
+    void StartNextAction()
     {
-        int maxAttempts = 10;
+        isActing = true;
 
-        for (int i = 0; i < maxAttempts; i++)
+        switch (currentPhase)
         {
-            Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
-            randomDirection.y = 0; // YÜKSEKLİK KARMAŞASI OLMASIN
-            Vector3 targetPosition = transform.position + randomDirection;
+            case ActionPhase.Walk:
+                Vector3 dest = GetRandomNavmeshPoint();
+                agent.SetDestination(dest);
+                agent.speed = 1.5f;
+                animator.SetBool("isWalking", true);
+                break;
 
-            if (NavMesh.SamplePosition(targetPosition, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
-            {
-                agent.SetDestination(hit.position);
-                Debug.Log("✅ Hedef bulundu: " + hit.position);
-                return;
-            }
+            case ActionPhase.Dance:
+                animator.SetBool("DoDance", true);
+                break;
+
+            case ActionPhase.SelfCheck:
+                animator.SetBool("DoSelfCheck", true);
+                break;
         }
 
-        Debug.LogWarning("❌ Geçerli hedef bulunamadı, karakter yerinde kalacak.");
-        isWaiting = false;
+        timer = actionDuration;
     }
 
-
-    void ResetAllBools()
+    void EndCurrentAction()
     {
-        agent.velocity = Vector3.zero;
+        isActing = false;
 
         animator.SetBool("isWalking", false);
-        animator.SetBool("isRunning", false);
-        animator.SetBool("isPhoneWalking", false);
-          
-        foreach (string action in idleActions)
-            animator.SetBool(action, false);
+        animator.SetBool("DoDance", false);
+        animator.SetBool("DoSelfCheck", false);
     }
 
-    bool IsInMovementAction()
+    void MoveToNextPhase()
     {
-        return animator.GetBool("isRunning") || animator.GetBool("isPhoneWalking");
+        currentPhase = (ActionPhase)(((int)currentPhase + 1) % 3); // Walk → Dance → SelfCheck → Walk...
     }
 
-    bool IsInIdleState()
+    Vector3 GetRandomNavmeshPoint()
     {
-        // Animator’daki idle state’in adını kontrol et
-        return animator.GetCurrentAnimatorStateInfo(0).IsName("idle_f_1_150f"); // animator'daki idle animasyon state'inin adını buraya yaz
+        for (int i = 0; i < 10; i++)
+        {
+            Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
+            randomDirection.y = 0;
+            Vector3 candidate = transform.position + randomDirection;
+
+            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
+                return hit.position;
+        }
+
+        return transform.position; // fallback
     }
 }
