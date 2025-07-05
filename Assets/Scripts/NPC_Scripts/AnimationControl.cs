@@ -2,12 +2,14 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Linq;
 
-public class SmartNPC : MonoBehaviour
+public class AnimationControl : MonoBehaviour
 {
     public float roamRadius = 10f;
     public float minActionTime = 6f;
     public float maxActionTime = 9f;
-    
+    [HideInInspector]
+    public bool isExternallyControlled = false;
+
 
     private NavMeshAgent agent;
     private Animator animator;
@@ -17,15 +19,21 @@ public class SmartNPC : MonoBehaviour
     private string currentAction = "";
 
     private string[] idleActions = { "DoDance", "DoDance2", "DoExercise", "DoSelfCheck", "DoPhoneTalk" };
-    private string[] movementActions = { "isPhoneWalking", "isRunning" };
+    private string[] movementActions = { "isPhoneWalking",  };
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        PlayRandomAction(); // sahne başladığında ilk eylemi başlat
-      
+        
+        
+
+        agent.ResetPath(); // 🔒 Hedef sıfırla
+        agent.velocity = Vector3.zero; // ⛔ Başlangıç kaymasını durdur
+
+        PlayRandomAction(); // ilk aksiyon başlat
     }
+
 
     void Update()
     {
@@ -33,13 +41,14 @@ public class SmartNPC : MonoBehaviour
         bool isMoving = speed > 0.1f;
 
         // Normal yürüme animasyonu
-        animator.SetBool("isWalking", isMoving && currentAction == "isWalking");
+        animator.SetBool("isWalking", isMoving && currentAction == "isWalking" && !isExternallyControlled);
 
 
-        // Eğer koşma aktifse ve hedef yoksa → yeni hedef ver
+
+        // Eğer KOŞUYORSA ve hedefi bittiyse → yeni nokta ver
         if (animator.GetBool("isRunning") && (!agent.hasPath || agent.remainingDistance < 0.5f))
         {
-            agent.speed = 4.5f; // Koşu hızı
+            agent.speed = 4.5f; // Koşma hızı
             MoveToRandomPoint();
         }
 
@@ -83,17 +92,20 @@ public class SmartNPC : MonoBehaviour
         currentAction = "";  // aktif aksiyonu boşalt
 
 
-        int type = Random.Range(0, 3); // 0 = idle action, 1 = phone walk, 2 = run
+        int type = Random.Range(0, 2); // 0 = idle action, 1 = phone walk, 2 = run
 
         if (type == 0) // Sabit animasyon
         {
             currentAction = idleActions[Random.Range(0, idleActions.Length)];
             animator.SetBool(currentAction, true);
             waitTimer = Random.Range(minActionTime, maxActionTime);
-            agent.ResetPath();
-            Debug.Log("🎬 Yeni aksiyon başladı: " + currentAction);
 
+            agent.ResetPath(); // ⛔ durdur
+            agent.velocity = Vector3.zero; // 🛑 kaymayı engelle
+
+            Debug.Log("🎬 Yeni aksiyon başladı: " + currentAction);
         }
+
         else if (type == 1) // Telefonla yürüme
         {
             currentAction = "isPhoneWalking";
@@ -141,10 +153,12 @@ public class SmartNPC : MonoBehaviour
 
     void ResetAllBools()
     {
+        agent.velocity = Vector3.zero;
+
         animator.SetBool("isWalking", false);
         animator.SetBool("isRunning", false);
         animator.SetBool("isPhoneWalking", false);
-
+          
         foreach (string action in idleActions)
             animator.SetBool(action, false);
     }
