@@ -76,7 +76,7 @@ CROWEL: Grudge Has Wings, bir 3D stealth-strategy aksiyon oyunu olarak oyuncular
 ## [DAILY SCRUM]
 + Görüşmeler çoğunlukla Whatsapp üzerinden yapılmıştır.
 + Gerekli durumlarda Slack takım kanalımızda huddle toplantıları düzenlenmiştir.
-+ [Daily Scrum Messages](url)
++ [Daily Scrum Messages via Drive](https://drive.google.com/drive/u/0/folders/10LfuCgrbaLYTVLfsbcvQqqjbHifXQap7)
 
 ## [SPRINT BOARD UPDATE]
 Sprint 1 Miro Board Screenshot
