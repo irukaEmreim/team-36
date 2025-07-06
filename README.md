@@ -1,3 +1,5 @@
+![CrowelGameLogo](CrowelSplash.png)
+
 # EKİP: CREW-36
 ## EKİP ÜYELERİ
 
@@ -9,7 +11,6 @@
 | Umut Başar | Developer |
 | Beste Bozkurt | Scrum Master, Product Owner |
 
-![CrowelGameLogo](CrowelSplashImage.png)
 
 <br><br>
 
