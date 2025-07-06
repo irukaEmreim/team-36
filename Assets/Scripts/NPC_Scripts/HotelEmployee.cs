@@ -1,28 +1,59 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
 public class HotelEmployee : BaseNPC
 {
-    protected override IEnumerator ReactToStress()
+    public override void TakeDamage(float amount)
+    {
+        base.TakeDamage(amount);
+
+        if (isReacting) return;
+
+        if (currentStress <= maxStress * 0.5f)
+        {
+            StartCoroutine(JustYell(4f));
+        }
+        else
+        {
+            StartCoroutine(RunThenYell(2f, 2f));
+        }
+    }
+
+    IEnumerator JustYell(float time)
     {
         isReacting = true;
+        StopAllAnimations();
+
+        animator.SetBool("isYelling", true);
+        yield return new WaitForSeconds(time);
+        animator.SetBool("isYelling", false);
+
+        isReacting = false;
+    }
+
+    IEnumerator RunThenYell(float runTime, float yellTime)
+    {
+        isReacting = true;
+        StopAllAnimations();
+        agent.isStopped = false;
 
         animator.SetBool("isRunning", true);
-        agent.speed = runSpeed;
-        Vector3 runTarget = transform.position + (Random.insideUnitSphere * runDistance);
+        agent.speed = 5f;
+
+        Vector3 runTarget = transform.position + (Random.insideUnitSphere * 5f);
         runTarget.y = transform.position.y;
+
         agent.SetDestination(runTarget);
 
-        yield return new WaitForSeconds(runDuration);
+        yield return new WaitForSeconds(runTime);
 
         animator.SetBool("isRunning", false);
-        agent.speed = normalSpeed;
         agent.ResetPath();
 
-        yield return new WaitForSeconds(0.1f); // idle frame atlamadan bekle
-        animator.SetTrigger("isAngry");
+        animator.SetBool("isYelling", true);
+        yield return new WaitForSeconds(yellTime);
+        animator.SetBool("isYelling", false);
 
-        yield return new WaitForSeconds(2f);
         isReacting = false;
     }
 }
