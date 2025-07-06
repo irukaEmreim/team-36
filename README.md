@@ -1,4 +1,4 @@
-![CrowelGameLogo](CrowelSplash.png)
+![WhatsApp Video 2025-07-05 at 11 20 07](https://github.com/user-attachments/assets/576a1474-cad1-428f-90cb-5f72ff9820f7)![CrowelGameLogo](CrowelSplash.png)
 
 # EKİP: GAAK CREW-36
 ## EKİP ÜYELERİ
@@ -82,8 +82,8 @@ CROWEL: Grudge Has Wings, bir 3D stealth-strategy aksiyon oyunu olarak oyuncular
 Sprint 1 Miro Board Screenshot
 + ![Sprint1Board](Sprint1Board.jpg)
 ## [ÜRÜN DURUMU]
-+ ![CrowMovementPrototype]()
-+ ![CrowHealthBarPrototype]()
++ ![CrowMovementPrototype](CrowMovement.gif)
++ ![CrowHealthBarPrototype](CrowHealthBar.gif)
 + ![NPCMovementsPrototype]()
 + ![NPCRandomizingCharacters]()
 + ![NPCStressBarPrototype]()
