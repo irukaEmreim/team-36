@@ -1,4 +1,4 @@
-![WhatsApp Video 2025-07-05 at 11 20 07](https://github.com/user-attachments/assets/576a1474-cad1-428f-90cb-5f72ff9820f7)![CrowelGameLogo](CrowelSplash.png)
+![CrowelGameLogo](CrowelSplash.png)
 
 # EKİP: GAAK CREW-36
 ## EKİP ÜYELERİ
