@@ -84,10 +84,8 @@ Sprint 1 Miro Board Screenshot
 ## [ÜRÜN DURUMU]
 + ![CrowMovementPrototype](CrowMovement.gif)
 + ![CrowHealthBarPrototype](CrowHealthBar.gif)
-+ ![NPCMovementsPrototype]()
-+ ![NPCRandomizingCharacters]()
-+ ![NPCStressBarPrototype]()
-+ ![SceneDesignInitial]()
++ ![NPCMovementsPrototype](GuestMovementStressBar.gif)
++ ![SceneDesignInitial](SceneDesignInitial.jpg)
 ## [SPRINT REVIEW]
 + Ekibimiz sprint için hedeflenen görevlerin büyük bir çoğunluğunu tamamlamış ve "temel hareket ve saldırı mekanikleri için prototipler ve assetler hazır olmalı" şeklinde ifade edilen sprint hedefine ulaşmıştır.
 + 
