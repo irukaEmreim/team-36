@@ -69,15 +69,25 @@ CROWEL: Grudge Has Wings, bir 3D stealth-strategy aksiyon oyunu olarak oyuncular
 + İlk takım toplantılarında takım üyelerinin tasarım ve kodlama alanlarında yetkinlik dereceleri üzerine konuşulmuş ve buna göre görev dağılımı yapılması düşünülmüştür. Fakat ilk sprint için ekipte henüz net alt gruplar oluşturulmamış ve bunun doğal bir şekilde oluşması amacıyla bu sprintin ekibin beraber çalışması ve ortaya çıkarılan işlerin anlaşılması açısından bir deneme olmasına karar verilmiştir.
 + Sprint review ve retrospective toplantısının 07.07.2025 Pazartesi tarihinde yapılması planlanmıştır.
 ## [SPRINT İÇİNDE TAMAMLANMASI HEDEFLENEN PUAN]
-+ 1. sprint için tamamlanması hedeflenen puan 28 olarak belirlenmiştir.
++ Sprint 1 için tamamlanması hedeflenen puan 28 olarak belirlenmiştir.
 ## [PUAN TAMAMLAMA MANTIĞI]
 + Görevler (To-Do) listelendikten sonra hepsine kolaydan zora doğru 1, 2 ve 3 şeklinde rakamlar atanmıştır ve bu rakamlar tüm görevler için zorluk ifade eden birer "tag" haline gelmiştir.
 + Görevlere verilen "tag"lerin toplamı, sprint içerisinde tamamlanması hedeflenen puana dönüşmüştür.
 ## [DAILY SCRUM]
 + Görüşmeler çoğunlukla Whatsapp üzerinden yapılmıştır.
 + Gerekli durumlarda Slack takım kanalımızda huddle toplantıları düzenlenmiştir.
++ [Daily Scrum Messages](url)
+
 ## [SPRINT BOARD UPDATE]
+Sprint 1 Miro Board Screenshot
++ ![Sprint1Board](Sprint1Board.jpg)
 ## [ÜRÜN DURUMU]
++ ![CrowMovementPrototype]()
++ ![CrowHealthBarPrototype]()
++ ![NPCMovementsPrototype]()
++ ![NPCRandomizingCharacters]()
++ ![NPCStressBarPrototype]()
++ ![SceneDesignInitial]()
 ## [SPRINT REVIEW]
 + Ekibimiz sprint için hedeflenen görevlerin büyük bir çoğunluğunu tamamlamış ve "temel hareket ve saldırı mekanikleri için prototipler ve assetler hazır olmalı" şeklinde ifade edilen sprint hedefine ulaşmıştır.
 + 
