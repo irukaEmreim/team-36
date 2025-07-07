@@ -59,6 +59,13 @@ public class AnimationControl : BaseNPC
 
         timer -= Time.deltaTime;
 
+        if (isExternallyControlled)
+        {
+            StopAllAnimations();
+            agent.ResetPath();
+            return;
+        }
+
         if (currentPhase == ActionPhase.Walk && (!agent.hasPath || agent.remainingDistance < 0.5f))
         {
             agent.ResetPath();
