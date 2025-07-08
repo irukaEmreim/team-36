@@ -696,6 +696,7 @@ MonoBehaviour:
   - {fileID: 1162463119}
   - {fileID: 1859313277}
   - {fileID: 1162856825}
+  - {fileID: 1262340026}
 --- !u!4 &668096420
 Transform:
   m_ObjectHideFlags: 0
@@ -917,6 +918,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1262340026 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5067369870479355018, guid: b7b09c9ed3d80ac448d0cc206cd1fa05, type: 3}
+  m_PrefabInstance: {fileID: 476586866}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1380458428 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5067369870479355018, guid: b7b09c9ed3d80ac448d0cc206cd1fa05, type: 3}
@@ -958,7 +964,7 @@ MonoBehaviour:
   - {fileID: 606554}
   - {fileID: 6622181992951259000}
   - {fileID: 4518435787522914120}
-  totalCount: 1
+  totalCount: 2
   area: {x: 30, y: 30}
   shirtMaterials:
   - {fileID: 2100000, guid: e3c92db89668ebb439f67832a852a3b4, type: 2}
@@ -1428,7 +1434,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1598670858319210081, guid: 6b7d31c436b6c84488bd01e13ba27eed, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.00000023841858
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1598670858319210081, guid: 6b7d31c436b6c84488bd01e13ba27eed, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1503,10 +1509,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.4
-  m_Height: 2
+  m_Radius: 0.13833272
+  m_Height: 1.7785733
   m_Direction: 1
-  m_Center: {x: 0, y: 1, z: 0}
+  m_Center: {x: -0.010969639, y: 0.88928664, z: 0.03041923}
 --- !u!1 &6559199268668828636 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2721185731973478414, guid: dfdd5f1bf1e517a4c94920d116e82023, type: 3}

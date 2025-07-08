@@ -7,17 +7,52 @@ public class Guest : BaseNPC
     {
         base.TakeDamage(amount);
 
+        if (isSitting)
+        {
+            Debug.Log("💺 Otururken hasar aldı");
+            StartCoroutine(SittingDodgeReaction());
+            return;
+        }
+
         if (isReacting) return;
 
         if (currentStress <= maxStress * 0.5f)
-        {
             StartCoroutine(LowStressReaction());
-        }
         else
-        {
             StartCoroutine(RunThenYell(2f, 2f));
-        }
     }
+
+    private IEnumerator SittingDodgeReaction()
+    {
+        isReacting = true;
+        StopAllAnimations();
+
+        Debug.Log("▶ SittingDodgeReaction Başladı");
+
+        agent.isStopped = true;
+        agent.ResetPath();
+        animator.SetBool("SittingTalk", false);
+        yield return null;
+
+        animator.SetBool("SittingDodge", true);
+        Debug.Log("🌀 SittingDodge TRUE");
+
+        yield return new WaitForSeconds(2f);
+
+        animator.SetBool("SittingDodge", false);
+        Debug.Log("🛑 SittingDodge FALSE");
+
+        yield return null;
+        animator.SetBool("SittingTalk", true);
+        Debug.Log("💬 Tekrar SittingTalk");
+
+        isReacting = false;
+    }
+
+
+
+
+
 
     
     void Update()
@@ -60,11 +95,16 @@ public class Guest : BaseNPC
         while (Vector3.Distance(transform.position, myChair.position) > 1f)
             yield return null;
 
+        // Sandalyeye vardıktan sonra:
         agent.ResetPath();
+        agent.isStopped = true;
+        agent.updatePosition = false;
+        agent.updateRotation = false;
+
         transform.rotation = myChair.rotation;
         animator.SetBool("isWalking", false);
+        animator.SetBool("isSitting", true);
 
-        animator.SetBool("isSitting", true); // 🔁 Bool parametresine göre geçiş
         isSitting = true;
 
         // Oturma sırasında oturuyormuş gibi "talking" animasyonu yapılabilir
@@ -72,15 +112,29 @@ public class Guest : BaseNPC
         yield return new WaitForSeconds(60f);
         animator.SetBool("SittingTalk", false);
 
+        // Kalkış animasyonu tetikleniyor
+        Debug.Log("🪑 Kalkış başlatıldı");
         animator.SetBool("isSitting", false);
+
+// 🕓 Kalkış animasyonunun bittiğini bekle
+        while (animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand"))
+        {
+            Debug.Log("🕐 Kalkıyor...");
+            yield return null;
+        }
+
+// ✅ Kalktıktan sonra durumları temizle
         isSitting = false;
-
-        yield return new WaitForSeconds(1f);
-
         ChairManager.Instance.ReleaseChair(myChair);
         myChair = null;
 
         // ✅ Oturma süreci bitti, kontrolü AnimationControl'e geri ver
+        agent.Warp(transform.position); // 💥 BU SATIR ÖNEMLİ
+        // Kalkınca tekrar aktif et
+        agent.isStopped = false;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+
         if (animCtrl != null)
             animCtrl.isExternallyControlled = false;
 
