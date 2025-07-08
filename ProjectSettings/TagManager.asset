@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Chair
+  - lb_bird
+  - PickupStone
+  - Human
+  - lb_groundTarget
+  - lb_perchTarget
   layers:
   - Default
   - TransparentFX
@@ -36,8 +41,8 @@ TagManager:
   - 
   - 
   - 
-  - 
-  - 
+  - Collectable
+  - Ground
   m_SortingLayers:
   - name: Default
     uniqueID: 0
