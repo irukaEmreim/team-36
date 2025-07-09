@@ -7,7 +7,6 @@
 |:----------|:----------|
 | Seray Keskinkılınç | Developer |
 | Yunus Emre Akyay | Developer |
-| Elif Duzcan | Developer |
 | Umut Başar | Developer |
 | Beste Bozkurt | Scrum Master, Product Owner |
 
