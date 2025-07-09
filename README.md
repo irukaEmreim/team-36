@@ -88,8 +88,22 @@ Sprint 1 Miro Board Screenshot
 + ![SceneDesignInitial](SceneDesignInitial.jpg)
 ## [SPRINT REVIEW]
 + Ekibimiz sprint için hedeflenen görevlerin büyük bir çoğunluğunu tamamlamış ve "temel hareket ve saldırı mekanikleri için prototipler ve assetler hazır olmalı" şeklinde ifade edilen sprint hedefine ulaşmıştır.
-+ 
++ Sprint sonunda ekip üyelerinden biri projeden ayrıldı. Sprint sürecini doğrudan etkilemese de ilerleyen planlamalarda dikkate alınması gereken bir gelişme oldu.
 ## [SPRINT RETROSPECTIVE]
+### İyi Gidenler
+- Task'ların kısa ve net bir şekilde tanımlanması, hızlı bitirilmelerini sağldı.
+- Belirgin kullanıcı rolleri (Karga, Müşteri, Otel Sahibi) için görev ayrımlarının yapılması planlamayı kolaylaştırdı.
+
+### İyi Gitmeyenler
+- Kısa ve net task tanımlamaları planlamayı kolaylaştırsa da yeterli sayıda task oluşturulmaması nedeniyle sprint içerisinde boş zamanlar oluştu. 
+
+### İyileştirme Önerileri
+- Haftalık 1-2 defa oyun test seansları düzenlenebilir.
+- Sprint başında görevlerini erken bitiren kişilerin devam edebileceği bir "task bitince yapılabilecekler" listesi tanımlanabilir. 
+
+### Aksiyon Maddeleri
+- Yeni sprint'te görevler daha gerçekçi süre tahminleriyle planlanacak.
+- Boş zamanlar için kullanılabilecek bir "task bitince yapılabilecekler" listesi oluşturulacak.
 
 <br><br>
 
