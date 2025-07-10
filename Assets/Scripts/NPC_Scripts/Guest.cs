@@ -37,18 +37,54 @@ public class Guest : BaseNPC
         animator.SetBool("SittingDodge", true);
         Debug.Log("🌀 SittingDodge TRUE");
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(2f); // dodge animasyonu süresi
 
         animator.SetBool("SittingDodge", false);
         Debug.Log("🛑 SittingDodge FALSE");
 
         yield return null;
-        animator.SetBool("SittingTalk", true);
-        Debug.Log("💬 Tekrar SittingTalk");
 
-        isReacting = false;
+        if (currentStress <= maxStress * 0.5f)
+        {
+            Debug.Log("⚠ Stres düşük → kalkıp kaçacak");
+
+            animator.SetBool("isSitting", false);
+            isSitting = false;
+
+            if (myChair != null)
+            {
+                ChairManager.Instance.ReleaseChair(myChair);
+                myChair = null;
+            }
+
+            // 🕒 SitToStand animasyonunun başladığını ve bittiğini bekle
+            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand"));
+            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand") &&
+                                             animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f);
+
+           // 🎯 SitToStand bittikten sonra koşmaya başlasın
+            animator.SetTrigger("StartRun");
+            Debug.Log("🏃 StartRun tetiklendi");
+
+            // NavMesh geri aktif
+            agent.Warp(transform.position);
+            agent.isStopped = false;
+            agent.updatePosition = true;
+            agent.updateRotation = true;
+
+            var animCtrl = GetComponent<AnimationControl>();
+            if (animCtrl != null)
+                animCtrl.isExternallyControlled = false;
+
+            StartCoroutine(RunThenYell(2f, 2f));
+        }
+        else
+        {
+            animator.SetBool("SittingTalk", true);
+            Debug.Log("💬 Tekrar SittingTalk");
+            isReacting = false;
+        }
     }
-
 
 
 
