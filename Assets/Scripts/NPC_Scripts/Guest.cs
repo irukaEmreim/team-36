@@ -48,7 +48,7 @@ public class Guest : BaseNPC
         {
             Debug.Log("⚠ Stres düşük → kalkıp kaçacak");
 
-            animator.SetBool("isSitting", false);
+            animator.SetBool("isSitting", false);  // SitToStand'e geçiş
             isSitting = false;
 
             if (myChair != null)
@@ -57,27 +57,34 @@ public class Guest : BaseNPC
                 myChair = null;
             }
 
-            // 🕒 SitToStand animasyonunun başladığını ve bittiğini bekle
+            // 🕒 SitToStand başladı → Idle’a geçmeye hazırlık
             yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand"));
-            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand") &&
-                                             animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f);
 
-           // 🎯 SitToStand bittikten sonra koşmaya başlasın
-            animator.SetTrigger("StartRun");
-            Debug.Log("🏃 StartRun tetiklendi");
+            // 🕓 SitToStand bitince Idle’a geçiş için tetikle
+            yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.95f);
+            animator.SetBool("doStand", true); // Idle’a geçiş
 
-            // NavMesh geri aktif
+            // 🏃 Hemen ardından koşma hazırlığı
+            animator.SetBool("isRunning", true);
+
+            // 🛠 NavMesh yeniden aktif
             agent.Warp(transform.position);
             agent.isStopped = false;
             agent.updatePosition = true;
             agent.updateRotation = true;
 
+            // Kontrolü iade et
             var animCtrl = GetComponent<AnimationControl>();
             if (animCtrl != null)
                 animCtrl.isExternallyControlled = false;
 
+            // Koşma süreci başlat
             StartCoroutine(RunThenYell(2f, 2f));
+            animator.SetBool("isRunning", false);
+            animator.SetBool("doStand", false);
+
         }
+
         else
         {
             animator.SetBool("SittingTalk", true);
@@ -85,6 +92,7 @@ public class Guest : BaseNPC
             isReacting = false;
         }
     }
+
 
 
 
@@ -151,6 +159,7 @@ public class Guest : BaseNPC
         // Kalkış animasyonu tetikleniyor
         Debug.Log("🪑 Kalkış başlatıldı");
         animator.SetBool("isSitting", false);
+        animator.SetTrigger("DoStand");
 
 // 🕓 Kalkış animasyonunun bittiğini bekle
         while (animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand"))
@@ -161,6 +170,7 @@ public class Guest : BaseNPC
 
 // ✅ Kalktıktan sonra durumları temizle
         isSitting = false;
+       
         ChairManager.Instance.ReleaseChair(myChair);
         myChair = null;
 
