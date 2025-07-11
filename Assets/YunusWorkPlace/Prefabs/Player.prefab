@@ -608,6 +608,7 @@ GameObject:
   - component: {fileID: 1579542547933865043}
   - component: {fileID: 1423771015}
   - component: {fileID: 1423771016}
+  - component: {fileID: 1426054190404010529}
   - component: {fileID: 1423771017}
   - component: {fileID: 1423771018}
   - component: {fileID: 1423771019}
@@ -832,6 +833,18 @@ MonoBehaviour:
   rockImage:
   - {fileID: 0}
   - {fileID: 0}
+--- !u!114 &1426054190404010529
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579542547933865052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da768775264faf949abffeab72c9d21c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &1423771017
 MonoBehaviour:
   m_ObjectHideFlags: 0

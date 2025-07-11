@@ -118,6 +118,8 @@ public class CrowDirectAttack : MonoBehaviour
         HandleStonePickupInput();
         UpdateRockUI();
         Debug.DrawRay(rayOriginTransform.position, rayOriginTransform.forward * pickupRange, Color.black);
+        Debug.DrawRay(rayOriginTransform.position, rayOriginTransform.forward * pickupRange, Color.red, 0.1f);
+
     }
 
     // TAS TOPLA
@@ -128,6 +130,8 @@ public class CrowDirectAttack : MonoBehaviour
             TryRaycastPickup();
         }
     }
+
+    public float pickupRadius = 1f;
     private void TryRaycastPickup()
     {
         if (currentStoneCount >= maxStoneCount)
