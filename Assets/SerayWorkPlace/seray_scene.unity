@@ -964,7 +964,7 @@ MonoBehaviour:
   - {fileID: 606554}
   - {fileID: 6622181992951259000}
   - {fileID: 4518435787522914120}
-  totalCount: 2
+  totalCount: 9
   area: {x: 30, y: 30}
   shirtMaterials:
   - {fileID: 2100000, guid: e3c92db89668ebb439f67832a852a3b4, type: 2}

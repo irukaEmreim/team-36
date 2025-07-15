@@ -833,6 +833,7 @@ MonoBehaviour:
   rockImage:
   - {fileID: 0}
   - {fileID: 0}
+  pickupRadius: 1
 --- !u!114 &1426054190404010529
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -845,6 +846,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: da768775264faf949abffeab72c9d21c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rayOriginTransform: {fileID: 192847045}
+  rayDistance: 2
+  fallableLayer:
+    serializedVersion: 2
+    m_Bits: 536870912
+  pressTextUI: {fileID: 0}
+  throwForce: 10
+  transformPosY: 7
+  pigeonLayer:
+    serializedVersion: 2
+    m_Bits: 134217728
+  flyDuration: 10
 --- !u!114 &1423771017
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -892,7 +905,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraTransform: {fileID: 0}
-  groundCheckDistance: 0.2
+  groundCheckDistance: 0.25
   groundLayer:
     serializedVersion: 2
     m_Bits: 2147483648

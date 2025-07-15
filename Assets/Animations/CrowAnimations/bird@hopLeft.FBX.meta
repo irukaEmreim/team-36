@@ -446,7 +446,7 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.878155
+      - time: 0.95710236
         functionName: ResetHopTrigger
         data: 
         objectReferenceParameter: {instanceID: 0}

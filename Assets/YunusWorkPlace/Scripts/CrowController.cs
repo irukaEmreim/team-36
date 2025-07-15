@@ -9,7 +9,7 @@ public class CrowController : MonoBehaviour
     private CrowFlight crowFlight;
     private CrowDirectAttack crowDirectAttack;
     public Transform cameraTransform;
-    public float groundCheckDistance = 0.2f;
+    public float groundCheckDistance = 0.25f;
     public LayerMask groundLayer;
     public bool isGrounded = true;
 

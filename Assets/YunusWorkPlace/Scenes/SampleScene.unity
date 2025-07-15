@@ -289,7 +289,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 56544707}
-  m_LocalRotation: {x: 0.071647026, y: -0.0000000042905395, z: 3.081965e-10, w: 0.9974301}
+  m_LocalRotation: {x: 0.071647026, y: 0.0000000042905413, z: -3.081966e-10, w: 0.9974301}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -673,11 +673,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a8f66d3eeac61d45baf63cde3ca856a, type: 3}
---- !u!4 &364482900 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 192847045, guid: 595a489358a8868429448991e26880fa, type: 3}
-  m_PrefabInstance: {fileID: 4678515944477747101}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &413232416
 GameObject:
   m_ObjectHideFlags: 0
@@ -3987,29 +3982,9 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1697724541}
     - target: {fileID: 1426054190404010529, guid: 595a489358a8868429448991e26880fa, type: 3}
-      propertyPath: throwForce
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 1426054190404010529, guid: 595a489358a8868429448991e26880fa, type: 3}
       propertyPath: pressTextUI
       value: 
       objectReference: {fileID: 153805598}
-    - target: {fileID: 1426054190404010529, guid: 595a489358a8868429448991e26880fa, type: 3}
-      propertyPath: rayDistance
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 1426054190404010529, guid: 595a489358a8868429448991e26880fa, type: 3}
-      propertyPath: pigeonLayer.m_Bits
-      value: 134217728
-      objectReference: {fileID: 0}
-    - target: {fileID: 1426054190404010529, guid: 595a489358a8868429448991e26880fa, type: 3}
-      propertyPath: rayOriginTransform
-      value: 
-      objectReference: {fileID: 364482900}
-    - target: {fileID: 1426054190404010529, guid: 595a489358a8868429448991e26880fa, type: 3}
-      propertyPath: fallableLayer.m_Bits
-      value: 536870912
-      objectReference: {fileID: 0}
     - target: {fileID: 1579542547933510076, guid: 595a489358a8868429448991e26880fa, type: 3}
       propertyPath: m_RootOrder
       value: 2
