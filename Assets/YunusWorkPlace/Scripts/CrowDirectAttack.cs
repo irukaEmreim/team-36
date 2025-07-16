@@ -49,7 +49,7 @@ public class CrowDirectAttack : MonoBehaviour
 
         foreach (var item in humans)
         {
-            item.GetComponent<NPC_Base>()?.TakeDamage(15);     // Bu tarz bir şey olacak humanda
+            item.GetComponent<BaseNPC>()?.TakeDamage(15);     // Bu tarz bir şey olacak humanda
             Debug.Log(item.name + " 15 hasar aldı");
         }
     }

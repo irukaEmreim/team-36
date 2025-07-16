@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Guest : BaseNPC
 {
-    public override void TakeDamage(float amount)
+    public virtual void TakeDamage(float amount)
     {
         base.TakeDamage(amount);
 
