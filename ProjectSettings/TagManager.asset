@@ -12,6 +12,7 @@ TagManager:
   - lb_perchTarget
   - FallableObject
   - Pigeon
+  - Fluid
   layers:
   - Default
   - TransparentFX
@@ -39,7 +40,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Grass
   - Pigeon
   - NPC
   - fallableLayer

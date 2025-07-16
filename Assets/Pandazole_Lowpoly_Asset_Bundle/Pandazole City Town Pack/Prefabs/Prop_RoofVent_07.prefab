@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7841764846489877346}
   - component: {fileID: 6592231923297531079}
   - component: {fileID: 8978109785835782157}
-  - component: {fileID: 8136797997467682403}
-  m_Layer: 0
+  - component: {fileID: 5963915354808810387}
+  m_Layer: 31
   m_Name: Prop_RoofVent_07
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26,7 +26,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7464816678671278552}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -82,8 +82,8 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &8136797997467682403
-MeshCollider:
+--- !u!65 &5963915354808810387
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -92,7 +92,6 @@ MeshCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 4
-  m_Convex: 1
-  m_CookingOptions: 30
-  m_Mesh: {fileID: -7636506381619217593, guid: a30c02dae4774cd49a2a5a06bea25c79, type: 3}
+  serializedVersion: 2
+  m_Size: {x: 0.707414, y: 0.5357968, z: 0.707414}
+  m_Center: {x: 0, y: 0.2678984, z: 0}
