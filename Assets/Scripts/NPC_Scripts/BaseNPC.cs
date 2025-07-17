@@ -1,32 +1,28 @@
 using UnityEngine;
 using UnityEngine.AI;
-using Microlight.MicroBar;
 using System.Collections;
+using Microlight.MicroBar;
+
+public enum NPCReactionType { Flee, ChaseAndThrow }
+
+[RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
 
 public abstract class BaseNPC : MonoBehaviour
 {
-    
-    protected GameObject currentTarget;
-    
-    protected Animator animator;
     protected NavMeshAgent agent;
-    public MicroBar stressBar;
-    public float runSpeed = 5f;
-    public float normalSpeed = 1.5f;
-
+    protected Animator animator;
+    protected GameObject currentTarget;
+    protected float currentStress = 100f;
     protected float maxStress = 100f;
-    protected float currentStress;
+    protected Microlight.MicroBar.MicroBar stressBar;
 
+    protected float runSpeed = 4.5f;
+    protected float normalSpeed = 1.5f;
     protected bool isReacting = false;
 
     protected virtual void Start()
     {
-        animator = GetComponent<Animator>();
-        agent = GetComponent<NavMeshAgent>();
-
-        currentStress = maxStress;
-
-        // 🔍 Eğer inspector'da atanmadıysa otomatik bul
+        
         if (stressBar == null)
             stressBar = GetComponentInChildren<MicroBar>();
 
@@ -35,81 +31,54 @@ public abstract class BaseNPC : MonoBehaviour
             stressBar.Initialize(maxStress);
             stressBar.UpdateBar(currentStress);
         }
-        else
-        {
-            Debug.LogWarning($"{gameObject.name} için stressBar atanmamış veya bulunamadı!");
-        }
-        
-        if (stressBar == null)
-        {
-            Debug.LogWarning($"{gameObject.name} için stressBar atanamadı!");
-        }
-        if (!agent.isOnNavMesh)
-        {
-            Debug.LogWarning($"{gameObject.name} NavMesh üstünde değil!");
-        }
-        Debug.Log($"{gameObject.name} → Speed: {agent.speed}, isStopped: {agent.isStopped}, hasPath: {agent.hasPath}");
 
-
-
+        agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
     }
-
-
 
     protected virtual void Update()
     {
-        if(currentTarget != null!=null)
-           FaceTarget(currentTarget);
+        if (currentTarget != null)
+            FaceTarget(currentTarget);
     }
-    protected IEnumerator SimpleReact()
+
+    public virtual void TakeDamage(float amount)
     {
+        // 🔧 STRESS AZALT
+        currentStress -= amount;
+        currentStress = Mathf.Clamp(currentStress, 0, 100f);
+
+        if (stressBar != null)
+            stressBar.UpdateBar(currentStress);
+
+        // 🔒 REACT EDİYORSA DUR
+        if (isReacting) return;
+
         isReacting = true;
         StopAllAnimations();
 
-        agent.ResetPath();
-        agent.isStopped = false;
-        agent.speed = runSpeed;
-
-        animator.SetBool("isRunning", true);
-
-        int maxTries = 5;
-        bool validTargetFound = false;
-        Vector3 runTarget = Vector3.zero;
-
-        for (int i = 0; i < maxTries; i++)
+        switch (GetReactionType())
         {
-            runTarget = GetRandomNavmeshPoint();
-
-            if (TryGetValidPath(out runTarget))
-            {
-                agent.SetDestination(runTarget);
-                Debug.Log($"{gameObject.name} ✅ Hedef → {runTarget}");
-            }
-            else
-            {
-                Debug.LogWarning($"{gameObject.name} ❌ Geçerli path oluşturulamadı.");
-            }
-
-            yield return null; // bir frame bekle ki agent hasPath güncellensin
-
-            if (agent.hasPath)
-            {
-                validTargetFound = true;
-                Debug.Log($"{gameObject.name} ✅ Hedef → {runTarget}");
+            case NPCReactionType.Flee:
+                StartCoroutine(FleeThenYell());
                 break;
-            }
-        }
 
-        if (!validTargetFound)
-        {
-            Debug.LogWarning($"{gameObject.name} ❌ Uygun hedef bulunamadı, olduğu yerde kalıyor.");
+            case NPCReactionType.ChaseAndThrow:
+                StartCoroutine(ChaseThenThrow());
+                break;
         }
+    }
+
+
+    protected IEnumerator FleeThenYell()
+    {
+        animator.SetBool("isRunning", true);
+        agent.speed = runSpeed;
+        agent.SetDestination(GetRandomNavmeshPoint());
 
         yield return new WaitForSeconds(2f);
-
-        animator.SetBool("isRunning", false);
         agent.ResetPath();
-        agent.speed = normalSpeed;
+        animator.SetBool("isRunning", false);
 
         animator.SetBool("isYelling", true);
         yield return new WaitForSeconds(2f);
@@ -117,107 +86,100 @@ public abstract class BaseNPC : MonoBehaviour
 
         isReacting = false;
     }
+
+    protected IEnumerator ChaseThenThrow()
+    {
+        GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
+        if (crow == null)
+        {
+            isReacting = false;
+            yield break;
+        }
+
+        currentTarget = crow;
+        agent.speed = runSpeed;
+        animator.SetBool("isRunning", true);
+
+        float chaseTime = 4f;
+        float t = 0f;
+
+        while (t < chaseTime)
+        {
+            agent.SetDestination(currentTarget.transform.position);
+            FaceTarget(currentTarget);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // 🔒 DURDUR
+        // ⛔ HER ŞEYİ DURDUR
+        agent.ResetPath();                  // rotayı iptal et
+        agent.velocity = Vector3.zero;     // hareketi kes
+        agent.isStopped = true;            // agent'ı durdur
+        agent.updatePosition = false;      // pozisyon güncellenmesin
+        agent.updateRotation = false;      // rotation da NPC'den gelsin
+
+        animator.SetBool("isRunning", false);
+
+// 🧍 Sabit dursun ama sana baksın
+        FaceTarget(currentTarget);
+
+// 🧱 Pozisyonu sabitle (yüksek hassasiyet için)
+        transform.position = agent.transform.position;
+
+// 🪨 THROW ANİMASYONU
+        animator.SetBool("throw", true);
+        yield return new WaitForSeconds(1f);
+        animator.SetBool("throw", false);
+
+// 🔓 Tekrar kontrolü aç
+        agent.isStopped = false;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+
+
+        currentTarget = null;
+        isReacting = false;
+    }
+
+    protected void FaceTarget(GameObject target)
+    {
+        Vector3 direction = target.transform.position - transform.position;
+        direction.y = 0f;
+        if (direction != Vector3.zero)
+        {
+            Quaternion rot = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 5f);
+        }
+    }
     
-    bool TryGetValidPath(out Vector3 result)
-    {
-        int attempts = 10;
-        NavMeshPath path = new NavMeshPath();
+    
 
-        for (int i = 0; i < attempts; i++)
-        {
-            Vector3 candidate = GetRandomNavmeshPoint();
-
-            if (NavMesh.CalculatePath(agent.transform.position, candidate, NavMesh.AllAreas, path))
-            {
-                if (path.status == NavMeshPathStatus.PathComplete)
-                {
-                    result = candidate;
-                    return true;
-                }
-            }
-        }
-
-        result = agent.transform.position; // fallback
-        return false;
-    }
-
-
-
-    protected bool TryGetSafeNavmeshTarget(out Vector3 result, float radius = 10f)
+    protected Vector3 GetRandomNavmeshPoint(float radius = 10f)
     {
         for (int i = 0; i < 10; i++)
         {
-            Vector3 randomDir = Random.insideUnitSphere * radius;
-            randomDir.y = 0;
-            Vector3 candidate = transform.position + randomDir;
+            Vector3 random = Random.insideUnitSphere * radius;
+            random.y = 0;
+            Vector3 point = transform.position + random;
 
-            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, 2f, NavMesh.AllAreas))
-            {
-                result = hit.position;
-                return true;
-            }
-        }
-
-        result = transform.position;
-        return false;
-    }
-
-
-
-    protected Vector3 GetRandomNavmeshPoint(float roamRadius = 10f)
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            Vector3 randomDirection = Random.insideUnitSphere * roamRadius;
-            randomDirection.y = 0;
-            Vector3 candidate = transform.position + randomDirection;
-
-            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, roamRadius, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(point, out NavMeshHit hit, radius, NavMesh.AllAreas))
                 return hit.position;
         }
 
         return transform.position;
     }
 
-
-
-    public virtual void TakeDamage(float amount)
-    {
-        currentStress -= amount;
-        currentStress = Mathf.Clamp(currentStress, 0, maxStress);
-
-        if (stressBar != null)
-            stressBar.UpdateBar(currentStress);
-
-        if (!isReacting)
-        {
-            StartCoroutine(SimpleReact());  // 👈 Eksik olan buydu
-        }
-    }
-
-
-    protected void FaceTarget(GameObject target)
-    {
-        Vector3 direction = target.transform.position - transform.position;
-        direction.y = 0f; // Yere sabit kal, yukarı bakma
-        if (direction != Vector3.zero)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
-        }
-    }
-
     protected void StopAllAnimations()
     {
-        animator.SetBool("DoDance", false);
-        animator.SetBool("DoDance2", false);
-        animator.SetBool("DoSelfCheck", false);
-        animator.SetBool("DoPhoneTalk", false);
         animator.SetBool("isWalking", false);
         animator.SetBool("isRunning", false);
         animator.SetBool("isYelling", false);
-
+        animator.SetBool("DoDance", false);
+        animator.SetBool("DoSelfCheck", false);
+        animator.ResetTrigger("throw");
         agent.ResetPath();
-        agent.velocity = Vector3.zero;
     }
+
+    protected abstract NPCReactionType GetReactionType();
 }
