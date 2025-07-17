@@ -23,13 +23,7 @@ public class AnimationControl : BaseNPC
         animator = GetComponent<Animator>();
 
         base.Start(); // BaseNPC setup
-        if (GetComponent<Guest>() == null && GetComponent<HotelEmployee>() == null)
-        {
-            if (Random.value < 0.2f)
-                gameObject.AddComponent<HotelEmployee>();
-            else
-                gameObject.AddComponent<Guest>();
-        }
+        
         // 🔁 Eğer atanmamışsa, kendisi bulsun
         if (stressBar == null)
             stressBar = GetComponentInChildren<MicroBar>();

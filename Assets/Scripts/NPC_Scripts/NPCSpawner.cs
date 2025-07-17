@@ -15,27 +15,31 @@ public class NPCSpawner : MonoBehaviour
 
     private HashSet<string> usedCombinations = new HashSet<string>();
 
-    
+    RuntimeAnimatorController guestAnimator;
+    RuntimeAnimatorController employeeAnimator;
+
     void Awake()
     {
+        guestAnimator = Resources.Load<RuntimeAnimatorController>("SmartNPC_Animator");
+        employeeAnimator = Resources.Load<RuntimeAnimatorController>("Employee");
+
         StartCoroutine(AssignRolesNextFrame());
     }
 
     IEnumerator AssignRolesNextFrame()
     {
-        yield return null; // 🕐 1 frame bekle
-
+        yield return null;
         AssignRoleToScenePrefabs();
     }
+
     void Start()
     {
-        
-
         int created = 0;
         int guestCount = 0;
         int employeeCount = 0;
-        int maxEmployees = 10;
-        int maxGuests = 40;
+        int maxEmployees = Mathf.FloorToInt(totalCount * 0.2f);
+        int maxGuests = totalCount - maxEmployees;
+
         int attempts = 0;
         int maxAttempts = totalCount * 10;
 
@@ -62,32 +66,28 @@ public class NPCSpawner : MonoBehaviour
 
             GameObject chosen = baseCharacters[Random.Range(0, baseCharacters.Length)];
             GameObject clone = Instantiate(chosen, pos, Quaternion.identity);
-
             ApplyMaterials(clone, shirtMaterials[s], hairMaterials[h], pantsMaterials[p], skinMaterials[sk]);
 
-            // Eğer karakterte zaten bir rol yoksa, yalnızca bir tane ekle
-            if (clone.GetComponent<Guest>() == null && clone.GetComponent<HotelEmployee>() == null)
-            {
-                if (guestCount < maxGuests)
-                {
-                    clone.AddComponent<Guest>();
-                    guestCount++;
-                }
-                else if (employeeCount < maxEmployees)
-                {
-                    clone.AddComponent<HotelEmployee>();
-                    employeeCount++;
-                }
-                
-                
-            }
-            
-            if (clone.GetComponent<Guest>() != null && clone.GetComponent<HotelEmployee>() != null)
-            {
-                Debug.LogWarning($"{clone.name} → aynı anda iki rol taşıyor!");
-            }
+            Animator animator = clone.GetComponent<Animator>();
+            if (animator == null)
+                animator = clone.AddComponent<Animator>();
 
+            if (employeeCount < maxEmployees && Random.value < 0.2f)
+            {
+                clone.AddComponent<HotelEmployee>();
+                employeeCount++;
 
+                if (employeeAnimator != null)
+                    animator.runtimeAnimatorController = employeeAnimator;
+            }
+            else if (guestCount < maxGuests)
+            {
+                clone.AddComponent<Guest>();
+                guestCount++;
+
+                if (guestAnimator != null)
+                    animator.runtimeAnimatorController = guestAnimator;
+            }
 
             created++;
         }
@@ -95,28 +95,55 @@ public class NPCSpawner : MonoBehaviour
 
     void AssignRoleToScenePrefabs()
     {
-        AnimationControl[] allInScene = FindObjectsOfType<AnimationControl>();
+        AnimationControl[] allInScene = FindObjectsOfType<AnimationControl>(true);
 
         int employeeCount = 0;
         int guestCount = 0;
+        int maxEmployees = Mathf.FloorToInt(totalCount * 0.2f); // %20 çalışan
 
         foreach (var ac in allInScene)
         {
             GameObject go = ac.gameObject;
 
-            if (go.GetComponent<Guest>() != null || go.GetComponent<HotelEmployee>() != null)
-                continue;
-
-
-            if (employeeCount < 10)
+            // 1. Animator bileşeni yoksa ekle
+            Animator animator = go.GetComponent<Animator>();
+            if (animator == null)
             {
-                go.AddComponent<HotelEmployee>();
-                employeeCount++;
+                animator = go.AddComponent<Animator>();
             }
+
+            // 2. Rol yoksa rol ver
+            if (go.GetComponent<Guest>() == null && go.GetComponent<HotelEmployee>() == null)
+            {
+                if (employeeCount < maxEmployees)
+                {
+                    go.AddComponent<HotelEmployee>();
+                    employeeCount++;
+
+                    if (employeeAnimator != null)
+                        animator.runtimeAnimatorController = employeeAnimator;
+                }
+                else
+                {
+                    go.AddComponent<Guest>();
+                    guestCount++;
+
+                    if (guestAnimator != null)
+                        animator.runtimeAnimatorController = guestAnimator;
+                }
+            }
+
+            // 3. Rol zaten varsa → ona göre Animator ver (EKSTRA GÜVENLİK KATMANI)
             else
             {
-                go.AddComponent<Guest>();
-                guestCount++;
+                if (go.GetComponent<HotelEmployee>() != null && animator != null && employeeAnimator != null)
+                {
+                    animator.runtimeAnimatorController = employeeAnimator;
+                }
+                else if (go.GetComponent<Guest>() != null && animator != null && guestAnimator != null)
+                {
+                    animator.runtimeAnimatorController = guestAnimator;
+                }
             }
         }
 
@@ -126,15 +153,12 @@ public class NPCSpawner : MonoBehaviour
     void ApplyMaterials(GameObject obj, Material shirtMat, Material hairMat, Material pantsMat, Material skinMat)
     {
         var renderers = obj.GetComponentsInChildren<SkinnedMeshRenderer>(true);
-
         foreach (var r in renderers)
         {
             Material[] newMats = r.materials;
-
             for (int i = 0; i < newMats.Length; i++)
             {
                 string matName = newMats[i].name.ToLower();
-
                 if (matName.Contains("shirt"))
                     newMats[i] = shirtMat;
                 else if (matName.Contains("hair"))
@@ -144,7 +168,6 @@ public class NPCSpawner : MonoBehaviour
                 else if (matName.Contains("skin") || matName.Contains("head") || matName.Contains("body") || matName.Contains("arm") || matName.Contains("leg"))
                     newMats[i] = skinMat;
             }
-
             r.materials = newMats;
         }
     }

@@ -3,19 +3,21 @@ using System.Collections;
 
 public class HotelEmployee : BaseNPC
 {
+    
+    
+    
+    public RuntimeAnimatorController Employee;
     public override void TakeDamage(float amount)
     {
-        base.TakeDamage(amount);
+        currentStress -= amount;
+        currentStress = Mathf.Clamp(currentStress, 0, maxStress);
 
-        if (isReacting) return;
+        if (stressBar != null)
+            stressBar.UpdateBar(currentStress);
 
-        if (currentStress <= maxStress * 0.5f)
+        if (!isReacting)
         {
-            StartCoroutine(JustYell(4f));
-        }
-        else
-        {
-            StartCoroutine(RunThenYell(2f, 2f));
+            StartCoroutine(ChaseThenThrow());
         }
     }
 
@@ -31,29 +33,52 @@ public class HotelEmployee : BaseNPC
         isReacting = false;
     }
 
-    IEnumerator RunThenYell(float runTime, float yellTime)
+    private IEnumerator ChaseThenThrow()
     {
         isReacting = true;
         StopAllAnimations();
-        agent.isStopped = false;
 
-        animator.SetBool("isRunning", true);
-        agent.speed = 5f;
+        agent.speed = runSpeed;
 
-        Vector3 runTarget = transform.position + (Random.insideUnitSphere * 5f);
-        runTarget.y = transform.position.y;
+        GameObject player = GameObject.FindGameObjectWithTag("lb_bird");
+        currentTarget = player;
+        if (player != null)
+        {
+            agent.isStopped = false;
+            agent.SetDestination(player.transform.position);
 
-        agent.SetDestination(runTarget);
+            float chaseDuration = 2f;
+            float timer = 0f;
 
-        yield return new WaitForSeconds(runTime);
+            animator.SetBool("isRunning", true);
+            while (timer < chaseDuration)
+            {
+                agent.SetDestination(player.transform.position);
+                FaceTarget(player); // 👈 Koşarken yüzünü döndür
+                timer += Time.deltaTime;
+                yield return null;
+            }
 
-        animator.SetBool("isRunning", false);
-        agent.ResetPath();
+            agent.ResetPath();
+            animator.SetBool("isRunning", false);
+        }
 
-        animator.SetBool("isYelling", true);
-        yield return new WaitForSeconds(yellTime);
-        animator.SetBool("isYelling", false);
+        // 👇 THROW sırasında da dönsün
+        animator.SetBool("throw", true);
 
+        float throwTime = 1f;
+        float throwTimer = 0f;
+        while (throwTimer < throwTime)
+        {
+            throwTimer += Time.deltaTime;
+            if (player != null)
+                FaceTarget(player);
+            yield return null;
+        }
+
+        animator.SetBool("throw", false);
+
+        agent.speed = normalSpeed;
         isReacting = false;
     }
 }

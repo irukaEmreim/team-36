@@ -6,6 +6,8 @@ using System.Collections;
 public abstract class BaseNPC : MonoBehaviour
 {
     
+    protected GameObject currentTarget;
+    
     protected Animator animator;
     protected NavMeshAgent agent;
     public MicroBar stressBar;
@@ -56,6 +58,8 @@ public abstract class BaseNPC : MonoBehaviour
 
     protected virtual void Update()
     {
+        if(currentTarget != null!=null)
+           FaceTarget(currentTarget);
     }
     protected IEnumerator SimpleReact()
     {
@@ -192,7 +196,16 @@ public abstract class BaseNPC : MonoBehaviour
     }
 
 
-
+    protected void FaceTarget(GameObject target)
+    {
+        Vector3 direction = target.transform.position - transform.position;
+        direction.y = 0f; // Yere sabit kal, yukarı bakma
+        if (direction != Vector3.zero)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+        }
+    }
 
     protected void StopAllAnimations()
     {
