@@ -131,7 +131,7 @@ public class CrowFlight : MonoBehaviour
         cinemachineFreeLook.m_Orbits[1].m_Height = Mathf.Lerp(cinemachineFreeLook.m_Orbits[1].m_Height, 0.3f, Time.deltaTime * 10f);
         cinemachineFreeLook.m_Orbits[2].m_Height = Mathf.Lerp(cinemachineFreeLook.m_Orbits[2].m_Height, 4f, Time.deltaTime * 10f);
 
-        cinemachineFreeLook.m_YAxis.m_InvertInput = true;
+        cinemachineFreeLook.m_YAxis.m_InvertInput = false;
     }
 
     public void changeCinemachineCameraValuesToGround()

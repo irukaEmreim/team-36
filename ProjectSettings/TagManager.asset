@@ -13,6 +13,7 @@ TagManager:
   - FallableObject
   - Pigeon
   - Fluid
+  - stealable
   layers:
   - Default
   - TransparentFX
@@ -39,7 +40,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Stealable
   - Grass
   - Pigeon
   - NPC

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PigeonController : MonoBehaviour
@@ -7,9 +8,10 @@ public class PigeonController : MonoBehaviour
     public float riseSpeed = 3f;
 
     private Rigidbody rb;
-    private bool isFlying = false;
+    public bool isFlying = false;
     private Vector3 flyDirection;
 
+    public List<Transform> birdsTranforms;
     public BoxCollider pigeonTriggerCollider;
     private void Awake()
     {
@@ -22,7 +24,6 @@ public class PigeonController : MonoBehaviour
 
         isFlying = true;
         pigeonTriggerCollider.enabled = true;
-        print("ÇALIŞIYOR MU");
         flyDirection = direction.normalized;
         flyDirection.y = 0; // Y ekseni
 
@@ -34,6 +35,11 @@ public class PigeonController : MonoBehaviour
         if (!isFlying) return;
         
         Vector3 currentPos = transform.position;
+
+        for (int i = 0; i < birdsTranforms.Count; i++)
+        {
+            birdsTranforms[i].rotation = Quaternion.LookRotation(flyDirection);
+        }
 
         if (currentPos.y < maxFlyHeight)
         {

@@ -15,7 +15,7 @@ public class CrowDirectAttack : MonoBehaviour
 
     [Header("Tas Ayarlari")]
     public int maxStoneCount = 2;
-    private int currentStoneCount = 0;
+    public int currentStoneCount = 0;
 
     public GameObject[] rocks;
     public Transform rockAttackTransform;

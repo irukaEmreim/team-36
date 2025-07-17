@@ -19,6 +19,7 @@ public class CrowIndirectAttack : MonoBehaviour
     [Header("Pigeon Ayarlari")]
     public float transformPosY = 7f;
     public LayerMask pigeonLayer;
+    public LayerMask stealableLayer;
 
     [Header("Uçuş Ayarları")]
     public float flyDuration = 10f;
@@ -28,13 +29,57 @@ public class CrowIndirectAttack : MonoBehaviour
     private PigeonController currentPigeon;
     private Vector3 flyDirection;
 
+    private CrowDirectAttack crowDirectAttack;
+
+    private GameObject stealableObject;
+    private Rigidbody playerRb;
+    void Awake()
+    {
+        crowDirectAttack = GetComponent<CrowDirectAttack>();
+        playerRb = GetComponent<Rigidbody>();
+    }
+
     private void Update()
     {
-        InDirectAttack();
+        ThrowAttack();
 
-        HandleRaycastAndInput();
+        HandlePigeonAttack();
+
+        StealAttack();
 
         HandleUI();
+
+        if (isStealing)
+        {
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                isStealing = false;
+                stealableObject.GetComponent<DiamondTransformController>().isTransforming = false;
+                Rigidbody rb = stealableObject.GetComponent<Rigidbody>();
+                rb.useGravity = true;
+                stealableObject.GetComponent<BoxCollider>().isTrigger = false;
+
+                float playerSpeed = playerRb.velocity.magnitude;
+                Vector3 throwDirection;
+
+                if (playerSpeed > 0.5f)
+                {
+                    throwDirection = playerRb.velocity.normalized;
+                    rb.velocity = throwDirection * throwForce + Vector3.up * 1f;
+                }
+                else
+                {
+                    rb.velocity = Vector3.down * 2f;
+                }
+
+                rb.angularVelocity = Random.insideUnitSphere * 5f;
+
+
+
+            }
+        }
+
+
         if (pigeonFly)
         {
             timer -= Time.deltaTime;
@@ -52,7 +97,7 @@ public class CrowIndirectAttack : MonoBehaviour
         }
     }
 
-    private void HandleRaycastAndInput()
+    private void HandlePigeonAttack()
     {
         Ray ray = new Ray(rayOriginTransform.position, rayOriginTransform.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, rayDistance, pigeonLayer))
@@ -81,7 +126,7 @@ public class CrowIndirectAttack : MonoBehaviour
 
 
 
-    private void InDirectAttack()
+    private void ThrowAttack()
     {
         Ray ray = new Ray(rayOriginTransform.position, rayOriginTransform.forward);
         RaycastHit hit;
@@ -109,6 +154,30 @@ public class CrowIndirectAttack : MonoBehaviour
         Debug.DrawRay(ray.origin, ray.direction * rayDistance, Color.red);
     }
 
+    public Transform rockAttackArea;
+    private bool isStealing = false;
+    private void StealAttack()
+    {
+        Ray ray = new Ray(rayOriginTransform.position, rayOriginTransform.forward);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit, rayDistance, stealableLayer))
+        {
+            if (hit.collider.CompareTag("stealable"))
+            {
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    print("ÇALMALI");
+                    hit.transform.position = rockAttackArea.position;
+                    crowDirectAttack.currentStoneCount = 0;
+                    stealableObject = hit.transform.gameObject;
+                    stealableObject.GetComponent<DiamondTransformController>().isTransforming = true;
+                    isStealing = true;
+                }
+                return;
+            }
+        }
+    }
     private void HandleUI()
     {
         Ray ray = new Ray(rayOriginTransform.position, rayOriginTransform.forward);
@@ -123,5 +192,7 @@ public class CrowIndirectAttack : MonoBehaviour
             pressTextUI.SetActive(false);
         }
     }
+
+ 
 
 }
