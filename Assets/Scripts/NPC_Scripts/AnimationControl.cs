@@ -31,11 +31,19 @@ public class AnimationControl : MonoBehaviour
 
         timer -= Time.deltaTime;
 
-        if (currentPhase == ActionPhase.Walk && (!agent.hasPath || agent.remainingDistance < 0.5f))
+        if (currentPhase == ActionPhase.Walk)
         {
-            agent.ResetPath();
-            animator.SetBool("isWalking", false);
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
+            {
+                if (!agent.hasPath || agent.velocity.sqrMagnitude == 0f)
+                {
+                    agent.ResetPath();
+                    animator.SetBool("isWalking", false);
+                }
+            }
         }
+
+
 
         if (timer <= 0f)
         {

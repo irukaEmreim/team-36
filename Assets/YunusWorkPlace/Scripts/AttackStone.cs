@@ -9,7 +9,7 @@ public class AttackStone : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Human"))
         {
-            other.gameObject.GetComponent<NPC_Base>().TakeDamage(20);
+            other.gameObject.GetComponent<BaseNPC>().TakeDamage(20);
             print("Human'a vurdu");
         }
     }

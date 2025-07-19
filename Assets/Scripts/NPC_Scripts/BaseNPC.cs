@@ -73,10 +73,23 @@ public abstract class BaseNPC : MonoBehaviour
     protected IEnumerator FleeThenYell()
     {
         animator.SetBool("isRunning", true);
-        agent.speed = runSpeed;
-        agent.SetDestination(GetRandomNavmeshPoint());
 
-        yield return new WaitForSeconds(2f);
+        agent.speed = (currentStress < maxStress * 0.5f) ? runSpeed * 2f : runSpeed;
+        Vector3 target = GetRandomNavmeshPoint(15f, 7f); // Daha uzak hedef
+        agent.SetDestination(target);
+
+        float timeElapsed = 0f;
+        float maxChaseTime = 3f;
+
+        while (timeElapsed < maxChaseTime)
+        {
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.2f)
+                break; // hedefe ulaştıysa erken bitir
+
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+
         agent.ResetPath();
         animator.SetBool("isRunning", false);
 
@@ -86,6 +99,8 @@ public abstract class BaseNPC : MonoBehaviour
 
         isReacting = false;
     }
+
+
 
     protected IEnumerator ChaseThenThrow()
     {
@@ -155,20 +170,24 @@ public abstract class BaseNPC : MonoBehaviour
     
     
 
-    protected Vector3 GetRandomNavmeshPoint(float radius = 10f)
+    protected Vector3 GetRandomNavmeshPoint(float maxRadius = 10f, float minDistance = 0f)
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 20; i++)
         {
-            Vector3 random = Random.insideUnitSphere * radius;
+            Vector3 random = Random.insideUnitSphere * maxRadius;
             random.y = 0;
-            Vector3 point = transform.position + random;
+            Vector3 candidate = transform.position + random;
 
-            if (NavMesh.SamplePosition(point, out NavMeshHit hit, radius, NavMesh.AllAreas))
+            if (Vector3.Distance(transform.position, candidate) < minDistance)
+                continue;
+
+            if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, maxRadius, NavMesh.AllAreas))
                 return hit.position;
         }
 
         return transform.position;
     }
+
 
     protected void StopAllAnimations()
     {

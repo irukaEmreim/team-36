@@ -41,5 +41,8 @@ public class GameTimeManager : MonoBehaviour
             Debug.Log($"⏱ Zaman: {seconds}s — Gün İlerlemesi: {dayProgress:F2} — Aktif Yemek: {CurrentMealTime}");
         }
     }
-
+    
+    public float CurrentTime => timer;
 }
+
+

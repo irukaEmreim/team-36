@@ -6,6 +6,9 @@ public class Guest : BaseNPC
     private bool isSitting = false;
     private Transform myChair = null;
     private bool isGoingToMeal = false;
+    private float fearDistance = 7f;
+    private float fearCooldown = 3f;
+    private float lastFearTime = -999f;
 
     private Transform hipBone; // 🍑 Oturma hizalaması için
 
@@ -38,12 +41,45 @@ public class Guest : BaseNPC
 
     private void Update()
     {
-        if (isReacting || isSitting || isGoingToMeal)
+        if (!isSitting && (isReacting || isGoingToMeal))
             return;
 
-        if (ShouldGoToMeal())
+        if (!isSitting && ShouldGoToMeal())
             StartCoroutine(GoSitAndEatRoutine());
+
+        CheckCrowProximity(); // 👈 bu her zaman çalışsın
     }
+
+    
+   
+
+    
+
+    private void CheckCrowProximity()
+    {
+        GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
+        if (crow == null || isReacting) return;
+
+        float distance = Vector3.Distance(transform.position, crow.transform.position);
+        if (distance < fearDistance)
+        {
+            if (isSitting)
+            {
+                animator.SetBool("SittingDodge", true);
+                animator.SetBool("SittingTalk", false);
+                StartCoroutine(ResetSittingDodge());
+            }
+            else
+            {
+                isReacting = true;
+                StopAllAnimations();
+                StartCoroutine(FleeThenYell());
+            }
+        }
+    }
+
+
+
 
     private bool ShouldGoToMeal()
     {
@@ -127,6 +163,8 @@ public class Guest : BaseNPC
         agent.isStopped = false;
         agent.updatePosition = true;
         agent.updateRotation = true;
+        
+        StartCoroutine(WalkAwayThenRoam(animCtrl));
 
         if (animCtrl != null)
         {
@@ -136,6 +174,29 @@ public class Guest : BaseNPC
 
         Debug.Log($"🧍 {gameObject.name} yemeği bitirdi, kalktı.");
     }
+    
+    private IEnumerator WalkAwayThenRoam(AnimationControl animCtrl)
+    {
+        Vector3 walkTarget = GetRandomNavmeshPoint(3f); // 3 birim uzağa yürü
+        agent.SetDestination(walkTarget);
+        agent.isStopped = false;
+        animator.SetBool("isWalking", true);
+
+        while (Vector3.Distance(transform.position, walkTarget) > 1f)
+            yield return null;
+
+        agent.ResetPath();
+        animator.SetBool("isWalking", false);
+
+        yield return new WaitForSeconds(0.3f); // küçük bekleme
+
+        if (animCtrl != null)
+        {
+            animCtrl.isExternallyControlled = false;
+            animCtrl.SendMessage("StartNextAction");
+        }
+    }
+
     public override void TakeDamage(float amount)
     {
         currentStress -= amount;
@@ -144,21 +205,69 @@ public class Guest : BaseNPC
         if (stressBar != null)
             stressBar.UpdateBar(currentStress);
 
+        // 🔴 STRESS %50'nin altındaysa → kaç
+        if (currentStress < maxStress * 0.5f)
+        {
+            if (isSitting)
+            {
+                // Kalkıp kaç!
+                StartCoroutine(StandThenFlee());
+            }
+            else if (!isReacting)
+            {
+                isReacting = true;
+                StopAllAnimations();
+                StartCoroutine(FleeThenYell()); // zaten 2x hızla kaçar
+            }
+            return;
+        }
+
+        // 🟢 STRESS yüksekse → eski davranış
         if (isSitting)
         {
             animator.SetBool("SittingDodge", true);
-            animator.SetBool("SittingTalk", false); // 🔇 Konuşmayı kes
-
+            animator.SetBool("SittingTalk", false);
             StartCoroutine(ResetSittingDodge());
             return;
         }
 
-        // Diğer tüm durumlar BaseNPC'de ele alınsın
         base.TakeDamage(amount);
     }
+    
+    private IEnumerator StandThenFlee()
+    {
+        Debug.Log($"{gameObject.name} oturuyordu ama stres yüksek → KAÇ!");
 
-  
+        animator.SetBool("SittingTalk", false);
+        animator.SetBool("isSitting", false);
+        animator.SetTrigger("doStand");
 
+        while (!animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand"))
+            yield return null;
+
+        while (animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand"))
+            yield return null;
+
+        isSitting = false;
+        isGoingToMeal = false;
+
+        if (myChair != null)
+        {
+            ChairManager.Instance.ReleaseChair(myChair);
+            myChair = null;
+        }
+
+        agent.Warp(transform.position);
+        agent.isStopped = false;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+
+        isReacting = true;
+        StopAllAnimations();
+
+        // Bu coroutine içinde doğrudan Flee’ye geç
+        yield return StartCoroutine(FleeThenYell());
+    }
 
 
     private IEnumerator ResetSittingDodge()
@@ -167,4 +276,11 @@ public class Guest : BaseNPC
         animator.SetBool("SittingDodge", false);
     }
 
+    
+    
+    //---------------------------------------------------------------------------------------------------------
+    //-------------------------------------------GÜNLÜK YÖNERGELER---------------------------------------------
+    //---------------------------------------------------------------------------------------------------------
+    
+    
 }
