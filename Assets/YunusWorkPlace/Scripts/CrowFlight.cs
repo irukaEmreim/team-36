@@ -75,6 +75,7 @@ public class CrowFlight : MonoBehaviour
         return transform.position.y >= targetFlyHeight;
     }
 
+    public Vector3 lastFlyDirection = Vector3.forward;
     public void Fly(Vector2 flyInput, Transform cameraTransform)
     {
         if (!canFreeFly) return;
@@ -87,7 +88,8 @@ public class CrowFlight : MonoBehaviour
         if (moveDirection != Vector3.zero)
         {
             rb.velocity = moveDirection * flightSpeed;
-
+            lastFlyDirection = moveDirection;
+            
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
         }

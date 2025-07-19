@@ -45,9 +45,9 @@ public class CrowIndirectAttack : MonoBehaviour
 
         HandlePigeonAttack();
 
-        StealAttack();
+        //StealAttack();
 
-        HandleUI();
+        //HandleUI();
 
         if (isStealing)
         {
@@ -156,6 +156,7 @@ public class CrowIndirectAttack : MonoBehaviour
 
     public Transform rockAttackArea;
     private bool isStealing = false;
+    /*
     private void StealAttack()
     {
         Ray ray = new Ray(rayOriginTransform.position, rayOriginTransform.forward);
@@ -177,7 +178,8 @@ public class CrowIndirectAttack : MonoBehaviour
                 return;
             }
         }
-    }
+    }*/
+    /*
     private void HandleUI()
     {
         Ray ray = new Ray(rayOriginTransform.position, rayOriginTransform.forward);
@@ -192,7 +194,7 @@ public class CrowIndirectAttack : MonoBehaviour
             pressTextUI.SetActive(false);
         }
     }
-
+    */
  
 
 }

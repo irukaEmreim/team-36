@@ -129,7 +129,8 @@ public class CrowController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Q) && currentState.IsFlying())
         {
-            crowDirectAttack.ThrowRock();
+            //crowDirectAttack.ThrowRock();
+            crowDirectAttack.ThrowItem();
         }
 
         if (Input.GetMouseButtonDown(0))

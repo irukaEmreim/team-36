@@ -14,6 +14,9 @@ TagManager:
   - Pigeon
   - Fluid
   - stealable
+  - Diamond
+  - Stone
+  - Thorn
   layers:
   - Default
   - TransparentFX
