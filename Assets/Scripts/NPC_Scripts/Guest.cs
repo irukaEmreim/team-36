@@ -1,5 +1,9 @@
+using System;
 using UnityEngine;
 using System.Collections;
+using NPC_Scripts;
+using UnityEngine.AI;
+using Random = UnityEngine.Random;
 
 public class Guest : BaseNPC
 {
@@ -9,12 +13,35 @@ public class Guest : BaseNPC
     private float fearDistance = 7f;
     private float fearCooldown = 3f;
     private float lastFearTime = -999f;
-
+    private bool prefersSport;
+    public static int totalGuests = 0;
+    public static int sportLovers = 0;
+    public static int sportAvoiders = 0;
     private Transform hipBone; // 🍑 Oturma hizalaması için
+    private bool hasBeenInitialized = false;
+
+
+    protected void Awake()
+    {
+        totalGuests++;
+        prefersSport = Random.value < 0.8f;
+
+        if (prefersSport) sportLovers++;
+        else sportAvoiders++;
+
+        Debug.Log($"🧠 {name} → prefersSport: {prefersSport}");
+
+        if (totalGuests <= 1)
+            StartCoroutine(DelayedSportSummary());
+    }
+
 
     protected override void Start()
     {
         base.Start();
+
+        // Eğer zaten atanmadıysa, burada kesin atansın
+       
 
         // Otomatik hipBone bul (LowManHips)
         if (hipBone == null)
@@ -32,8 +59,14 @@ public class Guest : BaseNPC
             if (hipBone == null)
                 Debug.LogWarning($"{gameObject.name} → HipBone bulunamadı!");
         }
+        
+       
     }
-
+    IEnumerator DelayedSportSummary()
+    {
+        yield return new WaitForSeconds(2f); // Tüm NPC’ler başlasın diye bekle
+        Debug.Log($"🏋️ Sporcu sayısı: {sportLovers} — Spor yapmayanlar: {sportAvoiders} — Toplam misafir: {totalGuests}");
+    }
     protected override NPCReactionType GetReactionType()
     {
         return NPCReactionType.Flee;
@@ -44,8 +77,7 @@ public class Guest : BaseNPC
         if (!isSitting && (isReacting || isGoingToMeal))
             return;
 
-        if (!isSitting && ShouldGoToMeal())
-            StartCoroutine(GoSitAndEatRoutine());
+      
 
         CheckCrowProximity(); // 👈 bu her zaman çalışsın
     }
@@ -281,6 +313,203 @@ public class Guest : BaseNPC
     //---------------------------------------------------------------------------------------------------------
     //-------------------------------------------GÜNLÜK YÖNERGELER---------------------------------------------
     //---------------------------------------------------------------------------------------------------------
+
+
+
+    private float actionTimer;
+    private bool isBusy = false;
+
+    private void OnEnable()
+    {
+        GameTimeManager.OnMinuteChanged += HandleMinuteChange;
+    }
+
+    private void OnDisable()
+    {
+        GameTimeManager.OnMinuteChanged -= HandleMinuteChange;
+    }
     
-    
+    void HandleMinuteChange(int minute)
+    {
+        if (isBusy) return;
+
+        float chance = Random.value;
+        if (minute == 0)
+        {
+            // Tüm misafirler random gezinsin
+            StartCoroutine(RandomRoamForSeconds(60));
+        }
+        else if (minute == 1)
+        {
+            if (prefersSport)
+            {
+                Debug.Log($"{name} sporcu olarak seçildi.");
+                StartCoroutine(GoToSport());
+            }
+            else
+            {
+                Debug.Log($"{name} sporu sevmedi, dolaşmaya çıktı.");
+                StartCoroutine(RandomRoamForSeconds(60));
+            }
+
+            Debug.Log($"📊 Şu anki istatistik: Toplam Guest: {totalGuests} — Sporcular: {sportLovers}");
+        }
+        if (minute == 2)
+        {
+            if (Random.Range(0f, 1f) <= 0.8f)
+                StartCoroutine(GoToBreakfast());
+            else
+                StartCoroutine(RandomRoamForSeconds(60));
+        }
+        else if (minute >= 3 && minute < 5)
+        {
+            if (chance < 0.8f)
+                StartCoroutine(GoToPoolOrSit());
+            else
+                StartCoroutine(RandomRoamForSeconds(120));
+        }
+        else if (minute == 5)
+        {
+            StartCoroutine(GoToLunch());
+        }
+        else if (minute == 6)
+        {
+            StartCoroutine(GoToPoolOrSit());
+        }
+        else if (minute == 9)
+        {
+            StartCoroutine(GoToDinner());
+        }
+        else if (minute == 10)
+        {
+            StartCoroutine(GoInside());
+        }
+    }
+    IEnumerator GoToSport()
+    {
+        isBusy = true;
+        Debug.Log($"{name} spora gidiyor.");
+        Vector3 sportArea = NoktaSpot.Instance.GetSportArea();
+        yield return MoveToTarget(sportArea);
+
+        animator.SetBool("DoExercise", true);
+        yield return new WaitForSeconds(30); // Spor süresini kısalt
+        animator.SetBool("DoExercise", false);
+
+        isBusy = false; // Kritik nokta: erken bırak
+        Debug.Log($"{name} spor yaptı, serbest.");
+    }
+
+    IEnumerator GoToBreakfast()
+    {
+        isBusy = true;
+        Debug.Log($"{name} kahvaltıya gidiyor.");
+
+        var animCtrl = GetComponent<AnimationControl>();
+        if (animCtrl != null)
+            animCtrl.isExternallyControlled = true;
+
+        // Mevcut oturma sistemini kullan:
+        yield return StartCoroutine(GoSitAndEatRoutine());
+
+        if (animCtrl != null)
+        {
+            animCtrl.isExternallyControlled = false;
+            animCtrl.SendMessage("StartNextAction");
+        }
+
+        isBusy = false;
+    }
+
+    IEnumerator GoToLunch() => GoToBreakfast(); // aynı yapı
+
+    IEnumerator GoToDinner() => GoToBreakfast();
+
+    IEnumerator GoToPoolOrSit()
+    {
+        isBusy = true;
+        if (Random.value < 0.5f)
+        {
+            // Havuz
+            Debug.Log($"{name} yüzmeye gidiyor.");
+            Vector3 poolPos = NoktaSpot.Instance.GetPoolSpot();
+            yield return MoveToTarget(poolPos);
+            animator.SetBool("DoSwim", true);
+            yield return new WaitForSeconds(120);
+            animator.SetBool("DoSwim", false);
+        }
+        else
+        {
+            // Sandalye
+            Transform chair = ChairManager.Instance.GetAvailableChair();
+            if (chair != null)
+            {
+                Debug.Log($"{name} oturmaya gidiyor.");
+                yield return MoveToTarget(chair.position);
+                animator.SetBool("DoSit", true);
+                yield return new WaitForSeconds(120);
+                animator.SetBool("DoSit", false);
+                ChairManager.Instance.ReleaseChair(chair);
+            }
+        }
+
+        isBusy = false;
+    }
+
+    IEnumerator GoInside()
+    {
+        isBusy = true;
+        Debug.Log($"{name} otele giriyor.");
+        Vector3 lobby = NoktaSpot.Instance.GetIndoorArea();
+        yield return MoveToTarget(lobby);
+        isBusy = false;
+    }
+
+    IEnumerator RandomRoamForSeconds(float duration)
+    {
+        isBusy = true;
+        float timer = duration;
+
+        while (timer > 0)
+        {
+            Vector3 randomSpot = GetRandomNavmeshPoint(8f);
+            agent.SetDestination(randomSpot);
+            animator.SetBool("isWalking", true);
+
+            // Yeni hedefe ulaşana kadar bekle (ama çok da takılmasın)
+            while (agent.pathPending || agent.remainingDistance > 0.8f)
+            {
+                // Eğer engelde takılırsa → tekrar yeni hedef
+                if (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid || agent.remainingDistance >= 20f)
+                {
+                    Debug.Log($"{name} → Patikada sorun! Yeni rota deneniyor...");
+                    break; // yeni hedefe geç
+                }
+
+                yield return null;
+            }
+
+            // Çok kısa hareket ettiyse → biraz zaman harcasın
+            float waitTime = Random.Range(1f, 2f);
+            yield return new WaitForSeconds(waitTime);
+            timer -= waitTime;
+        }
+
+        animator.SetBool("isWalking", false);
+        isBusy = false;
+    }
+
+    IEnumerator MoveToTarget(Vector3 target)
+    {
+        agent.SetDestination(target);
+        animator.SetBool("isWalking", true);
+        while (Vector3.Distance(transform.position, target) > 1f)
+        {
+            yield return null;
+        }
+        animator.SetBool("isWalking", false);
+    }
 }
+
+    
+
