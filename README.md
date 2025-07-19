@@ -113,7 +113,8 @@ Sprint 1 Miro Board Screenshot
 
 ## [SPRINT NOTLARI]
 + Backlog düzenimizde her task için detaylar ve açıklamalar "card details" kısmında yer almaktadır.
-![örnek]()
+![örnek](CardDetailsExample.jpg)
++ Önceki Sprint Retrospective yorumlarımız üzerine Miro tablomuzda "Rejected" kolonu çıkarılarak yerine "Optional Extra Tasks" kolonu eklenmiştir.
 + Sprint review ve retrospective toplantısının 20.07.2025 Pazar tarihinde yapılması planlanmıştır.
 + Sprint başlangıcında takımdan bir kişinin daha ayrılması sonucu güncel ekip üyeleri toplam 3 kişiye düşmüştür.
 
