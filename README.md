@@ -85,15 +85,17 @@ Sprint 1 Miro Board Screenshot
 + ![NPCMovementsPrototype](GuestMovementStressBar.gif)
 + ![SceneDesignInitial](SceneDesignInitial.jpg)
 ## [SPRINT REVIEW]
+Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
 + Ekibimiz sprint için hedeflenen görevlerin büyük bir çoğunluğunu tamamlamış ve "temel hareket ve saldırı mekanikleri için prototipler ve assetler hazır olmalı" şeklinde ifade edilen sprint hedefine ulaşmıştır.
 + Sprint sonunda ekip üyelerinden biri projeden ayrıldı. Sprint sürecini doğrudan etkilemese de ilerleyen planlamalarda dikkate alınması gereken bir gelişme oldu.
-+ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
+
 ## [SPRINT RETROSPECTIVE]
+Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
 
 ### Continue
-+ Task'ların kısa ve net bir şekilde tanımlanması, hızlı bitirilmelerini sağldı.
++ Task'ların kısa ve net bir şekilde tanımlanması, hızlı bitirilmelerini sağladı.
 + Belirgin kullanıcı rolleri (Karga, Müşteri, Otel Sahibi) için görev ayrımlarının yapılması planlamayı kolaylaştırdı.
-+ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
+
 
 ### Stop
 + Kısa ve net task tanımlamaları planlamayı kolaylaştırsa da yeterli sayıda task oluşturulmaması nedeniyle sprint içerisinde boş zamanlar oluştu.
@@ -137,12 +139,15 @@ Sprint 2 Miro Board Screenshot
 ## [ÜRÜN DURUMU]
 
 ## [SPRINT REVIEW]
+Toplantı katılımcıları:
+
 + Bu sprint takımın birinci sprintte prototiplerini oluşturduğu temel mekanikleri geliştirmesi ve detaylandırması şeklinde ilerlemiştir.
 + Tuzak sistemleri, saldırı mekanikleri, temel ana karakter ve NPC davranış mekanikleri bu sprintte oturtulmuş ve seviye akışı üzerinde çalışılmıştır.
 + Takımda developer rolünde Yunus Emre ve Seray ön plana çıkarken product owner rolünü Beste üstlenmektedir. Tasarım kısmına herkes katkıda bulunmaktadır.
-+ + Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
+
 
 ## [SPRINT RETROSPECTIVE]
+Toplantı katılımcıları:
 
 ### Continue
 ### Stop
