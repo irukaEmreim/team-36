@@ -137,6 +137,14 @@ Sprint 2 Miro Board Screenshot
 + ![Sprint1Board](Sprint2Board.jpg)
 
 ## [ÜRÜN DURUMU]
++ ![CrowAttack1](KargaSaldırılar.gif)
++ ![CrowAttack2](KargaSaldırılar2.gif)
++ ![CrowAttack3](KargaSaldırılar3.gif)
++ ![CrowStealing](KargaMücevherÇalma.gif)
++ ![HotelGarden1](HavuzBahçe.jpg)
++ ![HotelGarden2](HavuzBahçe2.jpg)
++ ![HotelPastry](Pastane.png)
+
 
 ## [SPRINT REVIEW]
 Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
