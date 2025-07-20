@@ -91,6 +91,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 
 ## [SPRINT RETROSPECTIVE]
 Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
+![Sprint1RetrospectiveBoard](Sprint1Retrospective.jpg)
 
 ### Continue
 + Task'ların kısa ve net bir şekilde tanımlanması, hızlı bitirilmelerini sağladı.
@@ -99,7 +100,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 
 ### Stop
 + Kısa ve net task tanımlamaları planlamayı kolaylaştırsa da yeterli sayıda task oluşturulmaması nedeniyle sprint içerisinde boş zamanlar oluştu.
-+ Bazı grup üyelerinin ayrılması üzerine görev dağılımı-kişi sayısı dengesinde aksama meydana geldi
++ Bazı grup üyelerinin ayrılması üzerine görev dağılımı-kişi sayısı dengesinde aksama meydana geldi.
 
 ### Invent
 + Haftalık 1-2 defa oyun test seansları düzenlenebilir.
@@ -116,7 +117,6 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 ## [SPRINT NOTLARI]
 + Backlog düzenimizde her task için detaylar ve açıklamalar "card details" kısmında yer almaktadır.
 ![örnek](CardDetailsExample.jpg)
-+ Önceki Sprint Retrospective yorumlarımız üzerine Miro tablomuzda "Rejected" kolonu çıkarılarak yerine "Optional Extra Tasks" kolonu eklenmiştir.
 + Sprint review ve retrospective toplantısının 20.07.2025 Pazar tarihinde yapılması planlanmıştır.
 + Sprint başlangıcında takımdan bir kişinin daha ayrılması sonucu güncel ekip üyeleri toplam 3 kişiye düşmüştür.
 
@@ -134,25 +134,37 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 
 ## [SPRINT BOARD UPDATE]
 Sprint 2 Miro Board Screenshot
-
++ ![Sprint1Board](Sprint2Board.jpg)
 
 ## [ÜRÜN DURUMU]
 
 ## [SPRINT REVIEW]
-Toplantı katılımcıları:
+Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
 
 + Bu sprint takımın birinci sprintte prototiplerini oluşturduğu temel mekanikleri geliştirmesi ve detaylandırması şeklinde ilerlemiştir.
 + Tuzak sistemleri, saldırı mekanikleri, temel ana karakter ve NPC davranış mekanikleri bu sprintte oturtulmuş ve seviye akışı üzerinde çalışılmıştır.
 + Takımda developer rolünde Yunus Emre ve Seray ön plana çıkarken product owner rolünü Beste üstlenmektedir. Tasarım kısmına herkes katkıda bulunmaktadır.
++ Önceki Sprint Retrospective yorumlarımız üzerine Miro tablomuzda "Rejected" kolonu çıkarılarak yerine "Optional Extra Tasks" kolonu eklenmiştir. Her opsiyonel ekstra task yapılabildiği takdirde sprint hedef puanına +3 puan olarak yansır.
 
 
 ## [SPRINT RETROSPECTIVE]
-Toplantı katılımcıları:
+Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
+![Sprint2RetrospectiveBoard](xxx.jpg)
 
 ### Continue
++ Taskların kısa ve net tanımlanması, hızlı bitirilmesini sağladı.
++ Tasklar ilerlerken yapılabilirlik ön planda oldu ve gerektiğinde proje buna göre revize edildi.
++ Sprint 2'de roller daha iyi belirginleştiği için görev dağılımı daha hızlıydı.
+   
 ### Stop
++ Sprint 1 döneminde grubun formasyonu esnasında yaşanan gecikmeler ve gruptan ayrılmalar 2. sprintin daha yoğun ve zorlu geçmesine neden oldu.
++ 3 kişilik grupta kişi başına düşen sorumluluk miktarı yüksekti.
+  
 ### Invent
++ Zaman yönetimi son sprintte daha çok önem kazanıyor, gerçekleştirilmekte zorlanılan taskler için zaman kaybetmeden farklı temel taskler halledilebilir.
+  
 ### Act
++Yeni sprint başlangıcında ilk iki gün bir önceki sprintte tamamlanamayan taskler halledilebilir, bug fix üzerine odaklanılabilir
 
 # [FİNAL NOTLAR]
 Oyunumuzda çoğunlukla hazır assetler kullanıldı. Kullanılan assetlerin linklerine oyun raporumuzun en güncel halinden veya Miro içerisinde assete ait task açıklamasından ulaşabilirsiniz.
