@@ -147,7 +147,7 @@ Sprint 2 Miro Board Screenshot
 
 
 ## [SPRINT REVIEW]
-Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
+Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozkurt
 
 + Bu sprint takımın birinci sprintte prototiplerini oluşturduğu temel mekanikleri geliştirmesi ve detaylandırması şeklinde ilerlemiştir.
 + Tuzak sistemleri, saldırı mekanikleri, temel ana karakter ve NPC davranış mekanikleri bu sprintte oturtulmuş ve seviye akışı üzerinde çalışılmıştır.
@@ -156,7 +156,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 
 
 ## [SPRINT RETROSPECTIVE]
-Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
+Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozkurt
 ![Sprint2RetrospectiveBoard](Sprint2Retrospective.jpg)
 
 ### Continue
