@@ -151,6 +151,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozk
 
 + Bu sprint takımın birinci sprintte prototiplerini oluşturduğu temel mekanikleri geliştirmesi ve detaylandırması şeklinde ilerlemiştir.
 + Tuzak sistemleri, saldırı mekanikleri, temel ana karakter ve NPC davranış mekanikleri bu sprintte oturtulmuş ve seviye akışı üzerinde çalışılmıştır.
++ Bazı tuzak mekaniklerinde yapılabilirlik üzerinden değişiklik ve güncellemeler yapılmıştır. (Ex. Su tuzağı çürük meyve tuzağına dönüştü)
 + Takımda developer rolünde Yunus Emre ve Seray ön plana çıkarken product owner rolünü Beste üstlenmektedir. Tasarım kısmına herkes katkıda bulunmaktadır.
 + Önceki Sprint Retrospective yorumlarımız üzerine Miro tablomuzda "Rejected" kolonu çıkarılarak yerine "Optional Extra Tasks" kolonu eklenmiştir. Her opsiyonel ekstra task yapılabildiği takdirde sprint hedef puanına +3 puan olarak yansır.
 
