@@ -41,7 +41,14 @@ public class Guest : BaseNPC
 
     protected override void Start()
     {
-        
+        base.Start(); // 👈 ÖNCE BASE ÇAĞRILMALI
+        if (!agent.isOnNavMesh)
+        {
+            Debug.LogWarning($"{name} → Başlangıçta NavMesh üzerinde değil, devre dışı bırakılıyor.");
+            gameObject.SetActive(false);
+            return;
+        }
+
         Transform[] allChildren = GetComponentsInChildren<Transform>(true);
         foreach (Transform t in allChildren)
         {
@@ -55,11 +62,6 @@ public class Guest : BaseNPC
             Debug.Log($"{name} → Elmas bulundu: {myDiamond.name}");
         else
             Debug.LogWarning($"{name} → Elmas bulunamadı! Kovalamayı asla başlatamaz.");
-
-
-
-
-        base.Start();
 
         // Eğer zaten atanmadıysa, burada kesin atansın
        
@@ -86,9 +88,10 @@ public class Guest : BaseNPC
     }
     private IEnumerator WaitToEnableJewelryCheck()
     {
-        yield return new WaitForSeconds(1f); // 1 saniye bekle
+        yield return new WaitUntil(() => GameTimeManager.Instance != null && GameTimeManager.Instance.CurrentTime > 5f);
         hasBeenInitialized = true;
     }
+
 
     IEnumerator DelayedSportSummary()
     {
@@ -108,7 +111,7 @@ public class Guest : BaseNPC
             return;
 
         CheckCrowProximity();
-        CheckIfJewelryStolen(); // 💎 bu eklendi
+       
     }
     void CheckIfJewelryStolen()
     {
@@ -124,6 +127,23 @@ public class Guest : BaseNPC
             Debug.Log($"{name} → Elmasım çalınmış! Kargayı kovalamaya başlıyorum.");
             OnJewelryStolen();
         }
+    }
+    public override void OnJewelryStolen()
+    {
+        if (isChasingCrowForJewelry) return;
+
+        Debug.Log($"{name} → [GUEST] Takısı çalındı! Kargayı kovalamaya başlıyor.");
+
+        isReacting = false;
+        StopAllAnimations();
+
+        isChasingCrowForJewelry = true;
+
+        if (jewelryChaseRoutine != null)
+            StopCoroutine(jewelryChaseRoutine);
+
+        // GUEST’E ÖZEL VERSİYONU KULLAN!
+        jewelryChaseRoutine = StartCoroutine(JewelryChase());
     }
 
 
@@ -186,6 +206,7 @@ public class Guest : BaseNPC
             if (animCtrl != null) animCtrl.isExternallyControlled = false;
             yield break;
         }
+        agent.ResetPath();
 
         agent.SetDestination(myChair.position);
         agent.isStopped = false;
@@ -259,6 +280,8 @@ public class Guest : BaseNPC
     private IEnumerator WalkAwayThenRoam(AnimationControl animCtrl)
     {
         Vector3 walkTarget = GetRandomNavmeshPoint(3f); // 3 birim uzağa yürü
+        agent.ResetPath();
+
         agent.SetDestination(walkTarget);
         agent.isStopped = false;
         animator.SetBool("isWalking", true);
@@ -350,6 +373,11 @@ public class Guest : BaseNPC
         yield return StartCoroutine(FleeThenYell());
     }
 
+
+    public void EnableJewelryCheck()
+    {
+        hasBeenInitialized = true;
+    }
 
     private IEnumerator ResetSittingDodge()
     {
@@ -523,17 +551,24 @@ public class Guest : BaseNPC
         {
             Vector3 randomSpot = GetRandomNavmeshPoint(8f);
 
-            // 🔧 Önceki path'i tamamen sıfırla
-            agent.ResetPath();
-            agent.velocity = Vector3.zero;
+            // 🔍 NavMesh üzerinde geçerli bir hedef mi kontrol et
+            if (NavMesh.SamplePosition(randomSpot, out NavMeshHit hit, 6f, NavMesh.AllAreas))
+            {
+                agent.SetDestination(hit.position);
+                animator.SetBool("isWalking", true);
+            }
+            else
+            {
+                Debug.LogWarning($"{name} → Geçersiz NavMesh noktası, atlandı.");
+                yield return new WaitForSeconds(0.5f);
+                continue;
+            }
 
-            agent.SetDestination(randomSpot);
-            animator.SetBool("isWalking", true);
-
-            // Yeni hedefe ulaşana kadar bekle (ama çok da takılmasın)
+            // Hedefe ulaşana kadar bekle
             while (agent.pathPending || agent.remainingDistance > 0.8f)
             {
-                if (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid || agent.remainingDistance >= 20f)
+                // Eğer patika bozulduysa yeni hedef ara
+                if (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid)
                 {
                     Debug.Log($"{name} → Patikada sorun! Yeni rota deneniyor...");
                     break;
@@ -552,17 +587,38 @@ public class Guest : BaseNPC
     }
 
 
+
     IEnumerator MoveToTarget(Vector3 target)
     {
-        agent.SetDestination(target);
+        if (!agent.isOnNavMesh)
+        {
+            Debug.LogWarning($"{name} → NavMesh üzerinde değil! Hedefe yürüyemiyor.");
+            yield break;
+        }
+
+        agent.ResetPath();
+        if (agent != null && agent.isOnNavMesh)
+        {
+            agent.SetDestination(target);
+            animator.SetBool("isWalking", true);
+        }
+        else
+        {
+            Debug.LogWarning($"{name} → Patika yokken rota verilmek istendi. NPC: {transform.position}");
+            yield break;
+        }
+
         animator.SetBool("isWalking", true);
+
         while (Vector3.Distance(transform.position, target) > 1f)
         {
             yield return null;
         }
+
+        agent.ResetPath();
         animator.SetBool("isWalking", false);
-        
     }
+
     public override void StopChasingCrow()
     {
         base.StopChasingCrow();
@@ -615,6 +671,8 @@ public class Guest : BaseNPC
         Vector3 roamTarget = GetRandomNavmeshPoint(8f);
         if (NavMesh.SamplePosition(roamTarget, out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
+            agent.ResetPath();
+
             agent.SetDestination(hit.position);
             animator.SetBool("isWalking", true);
         }
@@ -627,74 +685,80 @@ public class Guest : BaseNPC
         // 🔁 Gerçek roaming başlasın
         yield return StartCoroutine(RandomRoamForSeconds(60));
     }
-
-
-
     
-
     protected override IEnumerator JewelryChase()
     {
-        Debug.Log($"{name} → Kargayı 3x hızla kovalamaya başladı!");
-
         GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
         if (crow == null) yield break;
-
-        isReacting = false;
-        StopAllAnimations();
 
         agent.isStopped = false;
         agent.updatePosition = true;
         agent.updateRotation = true;
 
         currentTarget = crow;
-        agent.speed = runSpeed * 3f;
-
+        agent.speed = runSpeed;
         animator.SetBool("isRunning", true);
-        animator.SetBool("throw", false);
 
-        while (isChasingCrowForJewelry && crow != null)
+        // 🔥 Stres düşürme ayrı başlasın
+        if (stressDrainRoutine != null)
+            StopCoroutine(stressDrainRoutine);
+        stressDrainRoutine = StartCoroutine(DrainStressWhileChasing());
+
+        // 1. faz: 50'nin üstündeyken sadece kovala
+        while (isChasingCrowForJewelry && crow != null && currentStress > 60f)
         {
-            if (!IsJewelryStillStolen() || currentStress <= 0f)
-            {
-                StopChasingCrow();
-                yield break;
-            }
-
-            // Hedefe doğru koş
             agent.SetDestination(crow.transform.position);
-            animator.SetBool("isRunning", true); // ✅ Her döngüde garantiye al
-            FaceTarget(crow);
-
-            // Stres azalt
-            currentStress -= 10f;
-            currentStress = Mathf.Clamp(currentStress, 0, 100f);
-            if (stressBar != null) stressBar.UpdateBar(currentStress);
-
-            // STRES DÜŞÜKSE: taş at
-            if (currentStress < maxStress * 0.5f)
-            {
-                agent.ResetPath();
-                yield return StartCoroutine(ThrowOnceThenRun());
-
-                // Tekrar kovalamaya devam
-                if (crow != null)
-                {
-                    agent.SetDestination(crow.transform.position);
-                    animator.SetBool("isRunning", true); // tekrar aç
-                }
-            }
-
-            yield return new WaitForSeconds(3f);
+            yield return null;
         }
 
-        // Kovalama bittiğinde sıfırla
-        animator.SetBool("isRunning", false);
-        animator.SetBool("throw", false);
-        currentTarget = null;
-        agent.ResetPath();
-        isChasingCrowForJewelry = false;
+        // 2. faz: Throw yap, stres drain devam etsin
+        if (crow != null && currentStress <= 60f && currentStress > 0f)
+        {
+            
+            agent.ResetPath();
+            yield return StartCoroutine(ChaseThenThrow());
+            animator.SetBool("isRunning", true);
+        }
+
+        // 3. faz: Stres sıfıra düşene kadar sadece kovala
+        while (isChasingCrowForJewelry && crow != null && currentStress > 0f)
+        {
+            agent.SetDestination(crow.transform.position);
+            yield return null;
+        }
+
+        // Durdur
+        if (stressDrainRoutine != null)
+            StopCoroutine(stressDrainRoutine);
+        stressDrainRoutine = null;
+
+        StopChasingCrow();
     }
 
+    
+    private Coroutine stressDrainRoutine = null;
+
+    private IEnumerator DrainStressWhileChasing()
+    {
+        while (isChasingCrowForJewelry && currentStress > 0)
+        {
+            currentStress -= 10f;
+            currentStress = Mathf.Clamp(currentStress, 0, maxStress);
+            if (stressBar != null) stressBar.UpdateBar(currentStress);
+
+            yield return new WaitForSeconds(2f);
+        }
+    }
+
+
+
+
+
+
+
+
+
+ 
 
 
 

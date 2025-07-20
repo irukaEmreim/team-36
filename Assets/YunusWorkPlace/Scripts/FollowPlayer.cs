@@ -38,7 +38,7 @@ public class FollowPlayer : MonoBehaviour
         itemVel = rb.velocity.magnitude;
         if (isTransforming)
         {
-            print("EEE");
+           // print("EEE");
             isCollected = true;
             //rb.isKinematic = true;
             collider.isTrigger = true;

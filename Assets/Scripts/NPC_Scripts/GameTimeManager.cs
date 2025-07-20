@@ -54,7 +54,8 @@ public class GameTimeManager : MonoBehaviour
         timer += Time.deltaTime;
         dayProgress = timer / dayDurationInSeconds;
 
-        float currentMinute = Mathf.Floor(Time.time / 60f);
+        float currentMinute = Mathf.Floor(timer / 60f);
+
         if (currentMinute != lastReportedMinute)
         {
             lastReportedMinute = currentMinute;
@@ -114,7 +115,7 @@ public class GameTimeManager : MonoBehaviour
         if (Debug.isDebugBuild)
         {
             int seconds = Mathf.FloorToInt(timer);
-            Debug.Log($"⏱ Zaman: {seconds}s — Gün İlerlemesi: {dayProgress:F2} — 🔁 Aktif Aktivite: {CurrentActivity}");
+         //   Debug.Log($"⏱ Zaman: {seconds}s — Gün İlerlemesi: {dayProgress:F2} — 🔁 Aktif Aktivite: {CurrentActivity}");
         }
     }
     

@@ -1,3 +1,4 @@
+
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
@@ -6,7 +7,6 @@ using Microlight.MicroBar;
 public enum NPCReactionType { Flee, ChaseAndThrow }
 
 [RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
-
 public abstract class BaseNPC : MonoBehaviour
 {
     protected NavMeshAgent agent;
@@ -23,6 +23,13 @@ public abstract class BaseNPC : MonoBehaviour
     protected virtual void Start()
     {
         
+        agent = GetComponent<NavMeshAgent>();
+        animator = GetComponent<Animator>();
+
+        agent.autoBraking = false;
+        agent.angularSpeed = 1200f;
+        agent.acceleration = 40f;
+
         if (stressBar == null)
             stressBar = GetComponentInChildren<MicroBar>();
 
@@ -31,39 +38,33 @@ public abstract class BaseNPC : MonoBehaviour
             stressBar.Initialize(maxStress);
             stressBar.UpdateBar(currentStress);
         }
-
-        agent = GetComponent<NavMeshAgent>();
-        animator = GetComponent<Animator>();
     }
 
     protected virtual void Update()
     {
-        if (currentTarget != null)
-            FaceTarget(currentTarget);
-
+        
         if (isChasingCrowForJewelry)
         {
-            Debug.Log($"{name} → Takip hâlâ devam ediyor mu?"); // 🔍 EKLE
-
+            Debug.Log($"{name} → Takip hâlâ devam ediyor mu?");
             if (!IsJewelryStillStolen())
             {
-                Debug.Log($"{name} → Takı artık bende değilmiş! Takibi bırakıyor."); // 🔍 EKLE
+                Debug.Log($"{name} → Takı artık bende değilmiş! Takibi bırakıyor.");
                 StopChasingCrow();
             }
         }
+        CheckIfJewelryStolen(); // 💎 HER NPC için çalışsın
     }
 
+    protected virtual void CheckIfJewelryStolen() { }
 
     public virtual void TakeDamage(float amount)
     {
-        // 🔧 STRESS AZALT
         currentStress -= amount;
         currentStress = Mathf.Clamp(currentStress, 0, 100f);
 
         if (stressBar != null)
             stressBar.UpdateBar(currentStress);
 
-        // 🔒 REACT EDİYORSA DUR
         if (isReacting) return;
 
         isReacting = true;
@@ -74,20 +75,17 @@ public abstract class BaseNPC : MonoBehaviour
             case NPCReactionType.Flee:
                 StartCoroutine(FleeThenYell());
                 break;
-
             case NPCReactionType.ChaseAndThrow:
                 StartCoroutine(ChaseThenThrow());
                 break;
         }
     }
 
-
     protected IEnumerator FleeThenYell()
     {
         animator.SetBool("isRunning", true);
-
         agent.speed = (currentStress < maxStress * 0.5f) ? runSpeed * 2f : runSpeed;
-        Vector3 target = GetRandomNavmeshPoint(15f, 7f); // Daha uzak hedef
+        Vector3 target = GetRandomNavmeshPoint(15f, 7f);
         agent.SetDestination(target);
 
         float timeElapsed = 0f;
@@ -96,7 +94,7 @@ public abstract class BaseNPC : MonoBehaviour
         while (timeElapsed < maxChaseTime)
         {
             if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.2f)
-                break; // hedefe ulaştıysa erken bitir
+                break;
 
             timeElapsed += Time.deltaTime;
             yield return null;
@@ -104,15 +102,12 @@ public abstract class BaseNPC : MonoBehaviour
 
         agent.ResetPath();
         animator.SetBool("isRunning", false);
-
         animator.SetBool("isYelling", true);
         yield return new WaitForSeconds(2f);
         animator.SetBool("isYelling", false);
 
         isReacting = false;
     }
-
-
 
     protected IEnumerator ChaseThenThrow()
     {
@@ -133,75 +128,50 @@ public abstract class BaseNPC : MonoBehaviour
         while (t < chaseTime)
         {
             agent.SetDestination(currentTarget.transform.position);
-            FaceTarget(currentTarget);
             t += Time.deltaTime;
             yield return null;
         }
 
-        // 🔒 DURDUR
-        // ⛔ HER ŞEYİ DURDUR
-        agent.ResetPath();                  // rotayı iptal et
-        agent.velocity = Vector3.zero;     // hareketi kes
-        agent.isStopped = true;            // agent'ı durdur
-        agent.updatePosition = false;      // pozisyon güncellenmesin
-        agent.updateRotation = false;      // rotation da NPC'den gelsin
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
+        agent.isStopped = true;
+        agent.updatePosition = false;
+        agent.updateRotation = false;
 
-        animator.SetBool("isRunning", false);
+      
 
-// 🧍 Sabit dursun ama sana baksın
-        FaceTarget(currentTarget);
-
-// 🧱 Pozisyonu sabitle (yüksek hassasiyet için)
-        transform.position = agent.transform.position;
-
-// 🪨 THROW ANİMASYONU
+        // ✅ ÖNCE animasyon bool açık
         animator.SetBool("throw", true);
-        yield return new WaitForSeconds(1f);
+
+        // ⏱ Gerçek anim süresi kadar bekle
+        yield return new WaitForSeconds(4f);
+
+        // ✅ KAPAT
         animator.SetBool("throw", false);
 
-// 🔓 Tekrar kontrolü aç
         agent.isStopped = false;
         agent.updatePosition = true;
         agent.updateRotation = true;
-
 
         currentTarget = null;
         isReacting = false;
     }
 
-    protected IEnumerator ThrowOnceThenRun()
-    {
-        agent.isStopped = true;               // 🔒 Hareketi durdur
-        animator.SetBool("throw", true);
 
-        yield return new WaitForSeconds(4f);  // 🧨 Taş atma süresi
-
-        animator.SetBool("throw", false);     // 🔚 Animasyonu kapat
-
-        yield return new WaitForSeconds(1f);  // 🔁 Geçiş süresi gibi
-
-        agent.isStopped = false;              // 🔓 Tekrar koşmaya başlasın
-        agent.updatePosition = true;
-        agent.updateRotation = true;
-
-        animator.SetBool("isRunning", true);  // ✅ Tekrar koşmaya geç
-    }
-
-
-
+  
 
     protected void FaceTarget(GameObject target)
     {
         Vector3 direction = target.transform.position - transform.position;
         direction.y = 0f;
-        if (direction != Vector3.zero)
+
+        if (direction.sqrMagnitude > 0.01f)
         {
-            Quaternion rot = Quaternion.LookRotation(direction);
-            transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * 5f);
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 15f); // daha hızlı dönsün
         }
     }
-    
-    
+
 
     protected Vector3 GetRandomNavmeshPoint(float maxRadius = 10f, float minDistance = 0f)
     {
@@ -221,7 +191,6 @@ public abstract class BaseNPC : MonoBehaviour
         return transform.position;
     }
 
-
     protected void StopAllAnimations()
     {
         animator.SetBool("isWalking", false);
@@ -229,15 +198,15 @@ public abstract class BaseNPC : MonoBehaviour
         animator.SetBool("isYelling", false);
         animator.SetBool("DoDance", false);
         animator.SetBool("DoSelfCheck", false);
-        animator.ResetTrigger("throw");
+
+        // animator.SetBool("throw", false); // ❌ BUNU BURADAN KALDIR
+
         agent.ResetPath();
     }
 
+
     protected abstract NPCReactionType GetReactionType();
-    
-    //TAKI-----------------------------------------------------
-    //TAKI-----------------------------------------------------
-    //TAKI-----------------------------------------------------
+
     protected bool IsJewelryStillStolen()
     {
         GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
@@ -249,13 +218,11 @@ public abstract class BaseNPC : MonoBehaviour
         return IsMyDiamondStolen(cc.collectedDiamond);
     }
 
-
     protected bool IsMyDiamondStolen(GameObject diamond)
     {
         return diamond != null && diamond.name.ToLower().Contains("diamond") && !diamond.transform.IsChildOf(transform);
     }
 
-    
     public virtual void StopChasingCrow()
     {
         if (!isChasingCrowForJewelry) return;
@@ -273,21 +240,15 @@ public abstract class BaseNPC : MonoBehaviour
 
         agent.ResetPath();
         agent.velocity = Vector3.zero;
-        agent.Warp(transform.position); // sabitle
+        agent.Warp(transform.position);
 
-        // 👇 yeni coroutine çağrısı
         StartCoroutine(ResumeRoamAfterCooldown());
-        
     }
+
     protected virtual IEnumerator ResumeRoamAfterCooldown()
     {
-        yield break; // default: hiçbir şey yapmaz
+        yield break;
     }
-
-    
-
-
-
 
     protected bool isChasingCrowForJewelry = false;
     protected Coroutine jewelryChaseRoutine;
@@ -307,7 +268,6 @@ public abstract class BaseNPC : MonoBehaviour
         jewelryChaseRoutine = StartCoroutine(JewelryChase());
     }
 
-
     protected virtual IEnumerator JewelryChase()
     {
         GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
@@ -323,24 +283,19 @@ public abstract class BaseNPC : MonoBehaviour
 
         while (isChasingCrowForJewelry && crow != null)
         {
-            // Karga takip
             agent.SetDestination(crow.transform.position);
             FaceTarget(crow);
 
-            // Stres azaltma
             currentStress -= 10f;
             currentStress = Mathf.Clamp(currentStress, 0, 100f);
             if (stressBar != null) stressBar.UpdateBar(currentStress);
 
-            // Throw trigger kararları subclass'a bağlı
             yield return new WaitForSeconds(3f);
         }
 
-        // Bittiğinde reset
         animator.SetBool("isRunning", false);
         currentTarget = null;
         agent.ResetPath();
         isChasingCrowForJewelry = false;
     }
-
 }
