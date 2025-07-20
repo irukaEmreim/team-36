@@ -40,7 +40,19 @@ public abstract class BaseNPC : MonoBehaviour
     {
         if (currentTarget != null)
             FaceTarget(currentTarget);
+
+        if (isChasingCrowForJewelry)
+        {
+            Debug.Log($"{name} → Takip hâlâ devam ediyor mu?"); // 🔍 EKLE
+
+            if (!IsJewelryStillStolen())
+            {
+                Debug.Log($"{name} → Takı artık bende değilmiş! Takibi bırakıyor."); // 🔍 EKLE
+                StopChasingCrow();
+            }
+        }
     }
+
 
     public virtual void TakeDamage(float amount)
     {
@@ -157,6 +169,27 @@ public abstract class BaseNPC : MonoBehaviour
         isReacting = false;
     }
 
+    protected IEnumerator ThrowOnceThenRun()
+    {
+        agent.isStopped = true;               // 🔒 Hareketi durdur
+        animator.SetBool("throw", true);
+
+        yield return new WaitForSeconds(4f);  // 🧨 Taş atma süresi
+
+        animator.SetBool("throw", false);     // 🔚 Animasyonu kapat
+
+        yield return new WaitForSeconds(1f);  // 🔁 Geçiş süresi gibi
+
+        agent.isStopped = false;              // 🔓 Tekrar koşmaya başlasın
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+
+        animator.SetBool("isRunning", true);  // ✅ Tekrar koşmaya geç
+    }
+
+
+
+
     protected void FaceTarget(GameObject target)
     {
         Vector3 direction = target.transform.position - transform.position;
@@ -201,4 +234,113 @@ public abstract class BaseNPC : MonoBehaviour
     }
 
     protected abstract NPCReactionType GetReactionType();
+    
+    //TAKI-----------------------------------------------------
+    //TAKI-----------------------------------------------------
+    //TAKI-----------------------------------------------------
+    protected bool IsJewelryStillStolen()
+    {
+        GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
+        if (crow == null) return false;
+
+        CrowCollect cc = crow.GetComponent<CrowCollect>();
+        if (cc == null || cc.collectedDiamond == null) return false;
+
+        return IsMyDiamondStolen(cc.collectedDiamond);
+    }
+
+
+    protected bool IsMyDiamondStolen(GameObject diamond)
+    {
+        return diamond != null && diamond.name.ToLower().Contains("diamond") && !diamond.transform.IsChildOf(transform);
+    }
+
+    
+    public virtual void StopChasingCrow()
+    {
+        if (!isChasingCrowForJewelry) return;
+
+        Debug.Log($"{gameObject.name} → Takı bırakıldı, kovalamayı bırakıyor.");
+        isChasingCrowForJewelry = false;
+
+        if (jewelryChaseRoutine != null)
+            StopCoroutine(jewelryChaseRoutine);
+        jewelryChaseRoutine = null;
+
+        animator.SetBool("isRunning", false);
+        animator.SetBool("throw", false);
+        currentTarget = null;
+
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
+        agent.Warp(transform.position); // sabitle
+
+        // 👇 yeni coroutine çağrısı
+        StartCoroutine(ResumeRoamAfterCooldown());
+        
+    }
+    protected virtual IEnumerator ResumeRoamAfterCooldown()
+    {
+        yield break; // default: hiçbir şey yapmaz
+    }
+
+    
+
+
+
+
+    protected bool isChasingCrowForJewelry = false;
+    protected Coroutine jewelryChaseRoutine;
+
+    public virtual void OnJewelryStolen()
+    {
+        if (isChasingCrowForJewelry) return;
+
+        Debug.Log($"{name} → Takısı çalındı! Kargayı kovalamaya başlıyor.");
+
+        isReacting = false;
+        StopAllAnimations();
+
+        isChasingCrowForJewelry = true;
+        if (jewelryChaseRoutine != null)
+            StopCoroutine(jewelryChaseRoutine);
+        jewelryChaseRoutine = StartCoroutine(JewelryChase());
+    }
+
+
+    protected virtual IEnumerator JewelryChase()
+    {
+        GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
+        if (crow == null) yield break;
+
+        agent.isStopped = false;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+
+        currentTarget = crow;
+        agent.speed = runSpeed * 3f;
+        animator.SetBool("isRunning", true);
+
+        while (isChasingCrowForJewelry && crow != null)
+        {
+            // Karga takip
+            agent.SetDestination(crow.transform.position);
+            FaceTarget(crow);
+
+            // Stres azaltma
+            currentStress -= 10f;
+            currentStress = Mathf.Clamp(currentStress, 0, 100f);
+            if (stressBar != null) stressBar.UpdateBar(currentStress);
+
+            // Throw trigger kararları subclass'a bağlı
+            yield return new WaitForSeconds(3f);
+        }
+
+        // Bittiğinde reset
+        animator.SetBool("isRunning", false);
+        currentTarget = null;
+        agent.ResetPath();
+        isChasingCrowForJewelry = false;
+    }
+
 }
