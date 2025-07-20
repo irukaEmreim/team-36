@@ -149,7 +149,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 
 ## [SPRINT RETROSPECTIVE]
 Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başar, Beste Bozkurt
-![Sprint2RetrospectiveBoard](xxx.jpg)
+![Sprint2RetrospectiveBoard](Sprint2Retrospective.jpg)
 
 ### Continue
 + Taskların kısa ve net tanımlanması, hızlı bitirilmesini sağladı.
@@ -164,7 +164,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 + Zaman yönetimi son sprintte daha çok önem kazanıyor, gerçekleştirilmekte zorlanılan taskler için zaman kaybetmeden farklı temel taskler halledilebilir.
   
 ### Act
-+Yeni sprint başlangıcında ilk iki gün bir önceki sprintte tamamlanamayan taskler halledilebilir, bug fix üzerine odaklanılabilir
++ Yeni sprint başlangıcında ilk iki gün bir önceki sprintte tamamlanamayan taskler halledilebilir, bug fix üzerine odaklanılabilir
 
 # [FİNAL NOTLAR]
 Oyunumuzda çoğunlukla hazır assetler kullanıldı. Kullanılan assetlerin linklerine oyun raporumuzun en güncel halinden veya Miro içerisinde assete ait task açıklamasından ulaşabilirsiniz.
