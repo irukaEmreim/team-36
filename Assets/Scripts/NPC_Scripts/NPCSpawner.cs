@@ -1,12 +1,14 @@
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.AI;
+
 
 public class NPCSpawner : MonoBehaviour
 {
     public GameObject[] baseCharacters;
     public int totalCount = 50;
-    public Vector2 area = new Vector2(50, 50);
+    public Vector2 area = new Vector2(30, 30);
 
     public Material[] shirtMaterials;
     public Material[] hairMaterials;
@@ -32,66 +34,73 @@ public class NPCSpawner : MonoBehaviour
         AssignRoleToScenePrefabs();
     }
 
-    void Start()
+   void Start()
+{
+    int created = 0;
+    int guestCount = 0;
+    int employeeCount = 0;
+    int maxEmployees = Mathf.FloorToInt(totalCount * 0.2f);
+    int maxGuests = totalCount - maxEmployees;
+
+    int attempts = 0;
+    int maxAttempts = totalCount * 10;
+
+    while (created < totalCount && attempts < maxAttempts)
     {
-        int created = 0;
-        int guestCount = 0;
-        int employeeCount = 0;
-        int maxEmployees = Mathf.FloorToInt(totalCount * 0.2f);
-        int maxGuests = totalCount - maxEmployees;
+        attempts++;
 
-        int attempts = 0;
-        int maxAttempts = totalCount * 10;
+        int s = Random.Range(0, shirtMaterials.Length);
+        int h = Random.Range(0, hairMaterials.Length);
+        int p = Random.Range(0, pantsMaterials.Length);
+        int sk = Random.Range(0, skinMaterials.Length);
 
-        while (created < totalCount && attempts < maxAttempts)
+        string comboKey = $"{s}_{h}_{p}_{sk}";
+        if (usedCombinations.Contains(comboKey))
+            continue;
+
+        usedCombinations.Add(comboKey);
+
+        Vector3 randomPoint = new Vector3(
+            Random.Range(-area.x / 2f, area.x / 2f),
+            0,
+            Random.Range(-area.y / 2f, area.y / 2f)
+        );
+
+        // 🔍 NavMesh kontrolü
+        if (!NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
-            attempts++;
-
-            int s = Random.Range(0, shirtMaterials.Length);
-            int h = Random.Range(0, hairMaterials.Length);
-            int p = Random.Range(0, pantsMaterials.Length);
-            int sk = Random.Range(0, skinMaterials.Length);
-
-            string comboKey = $"{s}_{h}_{p}_{sk}";
-            if (usedCombinations.Contains(comboKey))
-                continue;
-
-            usedCombinations.Add(comboKey);
-
-            Vector3 pos = new Vector3(
-                Random.Range(-area.x / 2f, area.x / 2f),
-                0,
-                Random.Range(-area.y / 2f, area.y / 2f)
-            );
-
-            GameObject chosen = baseCharacters[Random.Range(0, baseCharacters.Length)];
-            GameObject clone = Instantiate(chosen, pos, Quaternion.identity);
-            ApplyMaterials(clone, shirtMaterials[s], hairMaterials[h], pantsMaterials[p], skinMaterials[sk]);
-
-            Animator animator = clone.GetComponent<Animator>();
-            if (animator == null)
-                animator = clone.AddComponent<Animator>();
-
-            if (employeeCount < maxEmployees && Random.value < 0.2f)
-            {
-                clone.AddComponent<HotelEmployee>();
-                employeeCount++;
-
-                if (employeeAnimator != null)
-                    animator.runtimeAnimatorController = employeeAnimator;
-            }
-            else if (guestCount < maxGuests)
-            {
-                clone.AddComponent<Guest>();
-                guestCount++;
-
-                if (guestAnimator != null)
-                    animator.runtimeAnimatorController = guestAnimator;
-            }
-
-            created++;
+            Debug.LogWarning($"❌ {randomPoint} → NavMesh dışında. Spawn atlandı.");
+            continue;
         }
+
+        GameObject chosen = baseCharacters[Random.Range(0, baseCharacters.Length)];
+        GameObject clone = Instantiate(chosen, hit.position, Quaternion.identity);
+        ApplyMaterials(clone, shirtMaterials[s], hairMaterials[h], pantsMaterials[p], skinMaterials[sk]);
+
+        Animator animator = clone.GetComponent<Animator>();
+        if (animator == null)
+            animator = clone.AddComponent<Animator>();
+
+        if (employeeCount < maxEmployees && Random.value < 0.2f)
+        {
+            clone.AddComponent<HotelEmployee>();
+            employeeCount++;
+
+            if (employeeAnimator != null)
+                animator.runtimeAnimatorController = employeeAnimator;
+        }
+        else if (guestCount < maxGuests)
+        {
+            clone.AddComponent<Guest>();
+            guestCount++;
+
+            if (guestAnimator != null)
+                animator.runtimeAnimatorController = guestAnimator;
+        }
+
+        created++;
     }
+}
 
     void AssignRoleToScenePrefabs()
     {

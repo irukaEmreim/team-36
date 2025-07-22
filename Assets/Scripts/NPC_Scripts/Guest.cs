@@ -41,14 +41,7 @@ public class Guest : BaseNPC
 
     protected override void Start()
     {
-        base.Start(); // 👈 ÖNCE BASE ÇAĞRILMALI
-        if (!agent.isOnNavMesh)
-        {
-            Debug.LogWarning($"{name} → Başlangıçta NavMesh üzerinde değil, devre dışı bırakılıyor.");
-            gameObject.SetActive(false);
-            return;
-        }
-
+        
         Transform[] allChildren = GetComponentsInChildren<Transform>(true);
         foreach (Transform t in allChildren)
         {
@@ -62,6 +55,11 @@ public class Guest : BaseNPC
             Debug.Log($"{name} → Elmas bulundu: {myDiamond.name}");
         else
             Debug.LogWarning($"{name} → Elmas bulunamadı! Kovalamayı asla başlatamaz.");
+
+
+
+
+        base.Start();
 
         // Eğer zaten atanmadıysa, burada kesin atansın
        
@@ -83,15 +81,18 @@ public class Guest : BaseNPC
                 Debug.LogWarning($"{gameObject.name} → HipBone bulunamadı!");
         }
         StartCoroutine(WaitToEnableJewelryCheck());
+       
 
+
+        
        
     }
+  
     private IEnumerator WaitToEnableJewelryCheck()
     {
-        yield return new WaitUntil(() => GameTimeManager.Instance != null && GameTimeManager.Instance.CurrentTime > 5f);
+        yield return new WaitForSeconds(1f); // 1 saniye bekle
         hasBeenInitialized = true;
     }
-
 
     IEnumerator DelayedSportSummary()
     {
@@ -111,7 +112,7 @@ public class Guest : BaseNPC
             return;
 
         CheckCrowProximity();
-       
+        CheckIfJewelryStolen(); // 💎 bu eklendi
     }
     void CheckIfJewelryStolen()
     {
@@ -374,11 +375,6 @@ public class Guest : BaseNPC
     }
 
 
-    public void EnableJewelryCheck()
-    {
-        hasBeenInitialized = true;
-    }
-
     private IEnumerator ResetSittingDodge()
     {
         yield return new WaitForSeconds(0.5f);
@@ -542,132 +538,154 @@ public class Guest : BaseNPC
         isBusy = false;
     }
 
-    IEnumerator RandomRoamForSeconds(float duration)
+    protected override IEnumerator RandomRoamForSeconds(float duration)
     {
         isBusy = true;
         float timer = duration;
 
         while (timer > 0)
         {
-            Vector3 randomSpot = GetRandomNavmeshPoint(8f);
+            Vector3 roamTarget = GetRandomNavmeshPoint(12f, 5f);
 
-            // 🔍 NavMesh üzerinde geçerli bir hedef mi kontrol et
-            if (NavMesh.SamplePosition(randomSpot, out NavMeshHit hit, 6f, NavMesh.AllAreas))
+            if (NavMesh.SamplePosition(roamTarget, out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
+                if (!agent.isOnNavMesh)
+                {
+                    Debug.LogWarning($"{name} → agent NavMesh'te değil!");
+                    yield return new WaitForSeconds(0.5f);
+                    continue;
+                }
+
+                agent.ResetPath();
                 agent.SetDestination(hit.position);
+                yield return new WaitForSeconds(0.1f); // 💥 Yol çizildi mi kontrol et
+
+                if (!agent.hasPath)
+                {
+                    Debug.LogWarning($"{name} → Yol çizilemedi. agent.hasPath = false");
+                    continue; // Yeni hedef ara
+                }
+
+                agent.isStopped = false;
                 animator.SetBool("isWalking", true);
+
             }
             else
             {
-                Debug.LogWarning($"{name} → Geçersiz NavMesh noktası, atlandı.");
+                Debug.LogWarning($"{name} → Uzak hedef NavMesh dışında.");
                 yield return new WaitForSeconds(0.5f);
                 continue;
             }
 
             // Hedefe ulaşana kadar bekle
-            while (agent.pathPending || agent.remainingDistance > 0.8f)
+            float wait = 0f;
+            float timeout = 3f;
+
+            while (agent.pathPending || agent.remainingDistance > 1.5f)
             {
-                // Eğer patika bozulduysa yeni hedef ara
-                if (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid)
+                if (agent.pathStatus == NavMeshPathStatus.PathInvalid || agent.pathStatus == NavMeshPathStatus.PathPartial)
                 {
-                    Debug.Log($"{name} → Patikada sorun! Yeni rota deneniyor...");
+                    Debug.Log($"{name} → Patika geçersiz veya eksik. Yeni hedef deneniyor.");
+                    break;
+                }
+
+                wait += Time.deltaTime;
+                if (wait > timeout)
+                {
+                    Debug.Log($"{name} → Patika çok uzun sürdü. Hedef iptal ediliyor.");
                     break;
                 }
 
                 yield return null;
             }
 
-            float waitTime = Random.Range(1f, 2f);
-            yield return new WaitForSeconds(waitTime);
-            timer -= waitTime;
+
+
+            // Yürüyüş bittiğinde durdur
+            agent.ResetPath();
+            animator.SetBool("isWalking", false);
+
+            float idleTime = Random.Range(3f, 6f); // 🧘‍♂️ dinlenme süresi
+            yield return new WaitForSeconds(idleTime);
+            timer -= idleTime;
         }
 
-        animator.SetBool("isWalking", false);
         isBusy = false;
     }
 
 
 
+
     IEnumerator MoveToTarget(Vector3 target)
     {
-        if (!agent.isOnNavMesh)
-        {
-            Debug.LogWarning($"{name} → NavMesh üzerinde değil! Hedefe yürüyemiyor.");
-            yield break;
-        }
-
         agent.ResetPath();
-        if (agent != null && agent.isOnNavMesh)
+
+        if (agent.isOnNavMesh)
         {
             agent.SetDestination(target);
-            animator.SetBool("isWalking", true);
         }
         else
         {
-            Debug.LogWarning($"{name} → Patika yokken rota verilmek istendi. NPC: {transform.position}");
-            yield break;
+            Debug.LogWarning($"{name} → agent NavMesh'te değil! Hedef atanamadı. fonksiyon movetotarget");
         }
 
         animator.SetBool("isWalking", true);
-
         while (Vector3.Distance(transform.position, target) > 1f)
         {
             yield return null;
         }
-
-        agent.ResetPath();
         animator.SetBool("isWalking", false);
+        
     }
-
     public override void StopChasingCrow()
     {
         base.StopChasingCrow();
 
-        // 🔓 Aşağıdakiler Guest’e özel
+        StopAllAnimations(); // 🔥 Animasyonları tam temizle
+        agent.speed = normalSpeed; // 🐢 Hız normale dönsün
+
         isReacting = false;
         animator.SetBool("isWalking", false);
         animator.SetBool("throw", false);
 
-        // ⛔ TÜM HAREKETLERİ SIFIRLA
         agent.isStopped = true;
         agent.ResetPath();
         agent.velocity = Vector3.zero;
         agent.updatePosition = false;
         agent.updateRotation = false;
 
-        // 🔧 GÜVENLİ POZİSYON DÜZELTME
         Vector3 safePos = transform.position;
         agent.Warp(safePos);
 
         Debug.Log($"{name} → Stres bitti veya takı bırakıldı. Normal yaşama dönüyor.");
 
-        // 🔁 GÜVENLİ ROAM BAŞLAT
         StartCoroutine(ResumeRoamAfterCooldown());
     }
 
 
+
     protected override IEnumerator ResumeRoamAfterCooldown()
     {
-        // 🛑 Ajanı sıfırla
         agent.isStopped = true;
         agent.ResetPath();
         agent.velocity = Vector3.zero;
         agent.updatePosition = false;
         agent.updateRotation = false;
 
-        // 🧱 Pozisyonu sabitle (önce warp)
+        // Güvenli pozisyon
         Vector3 safePos = transform.position;
         agent.Warp(safePos);
 
-        // 🧘 Küçük bir nefes alma süresi
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.2f); // Nefes arası
 
-        // ✅ Tekrar aç
         agent.isStopped = false;
         agent.updatePosition = true;
         agent.updateRotation = true;
 
-        // 🎯 Hedef belirle
+        // ❗ Warp sonrası bekleme ekle (Unity bug fix gibi)
+        yield return new WaitForSeconds(0.1f); 
+
+        // 🎯 Yeni hedef belirleme
         Vector3 roamTarget = GetRandomNavmeshPoint(8f);
         if (NavMesh.SamplePosition(roamTarget, out NavMeshHit hit, 2f, NavMesh.AllAreas))
         {
@@ -679,12 +697,13 @@ public class Guest : BaseNPC
         else
         {
             Debug.LogWarning($"{name} → Geçersiz roam hedefi! Hedef NavMesh dışı.");
-            yield break; // başlatma roamingi, çünkü hedef geçersiz
+            yield break;
         }
 
         // 🔁 Gerçek roaming başlasın
         yield return StartCoroutine(RandomRoamForSeconds(60));
     }
+
     
     protected override IEnumerator JewelryChase()
     {

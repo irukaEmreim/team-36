@@ -63,7 +63,15 @@ public class AnimationControl : MonoBehaviour
             case ActionPhase.Walk:
                 Vector3 dest = GetRandomNavmeshPoint();
                 agent.isStopped = false;
-                agent.SetDestination(dest);
+                if (agent.isOnNavMesh)
+                {
+                    agent.SetDestination(dest);
+                }
+                else
+                {
+                    Debug.LogWarning($"{name} → AnimationControl → agent NavMesh'te değil, hedef atanamadı!");
+                }
+
                 agent.speed = 1.5f;
                 animator.SetBool("isWalking", true);
                 break;

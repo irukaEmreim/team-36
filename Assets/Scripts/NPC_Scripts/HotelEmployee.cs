@@ -14,7 +14,6 @@ public class HotelEmployee : BaseNPC
     protected override void Update()
     {
         base.Update(); // 💥 Takı kovalamayı aktif tutar
-        CheckIfJewelryStolen(); // Takı kontrolü çalışsın
 
         if (isReacting) return;
 

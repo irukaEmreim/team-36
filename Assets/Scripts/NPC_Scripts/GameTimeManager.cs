@@ -54,8 +54,7 @@ public class GameTimeManager : MonoBehaviour
         timer += Time.deltaTime;
         dayProgress = timer / dayDurationInSeconds;
 
-        float currentMinute = Mathf.Floor(timer / 60f);
-
+        float currentMinute = Mathf.Floor(Time.time / 60f);
         if (currentMinute != lastReportedMinute)
         {
             lastReportedMinute = currentMinute;

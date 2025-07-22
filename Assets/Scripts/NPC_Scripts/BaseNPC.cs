@@ -38,11 +38,49 @@ public abstract class BaseNPC : MonoBehaviour
             stressBar.Initialize(maxStress);
             stressBar.UpdateBar(currentStress);
         }
+        StartCoroutine(WaitUntilNavReady());
     }
+    private IEnumerator WaitUntilNavReady()
+    {
+        int attempts = 0;
+        while (!agent.isOnNavMesh && attempts < 50)
+        {
+            yield return new WaitForSeconds(0.1f);
+            attempts++;
+        }
+
+        if (!agent.isOnNavMesh)
+            Debug.LogError($"{name} → 5 saniye geçti ama hâlâ NavMesh'te değil!");
+        else
+            Debug.Log($"{name} → Artık NavMesh üzerinde. Hazır!");
+    }
+    public void StartRoaming()
+    {
+        StartCoroutine(WaitForNavMeshThenRoam());
+    }
+
+    private IEnumerator WaitForNavMeshThenRoam()
+    {
+        int tries = 0;
+        while (!agent.isOnNavMesh && tries < 50)
+        {
+            yield return new WaitForSeconds(0.1f);
+            tries++;
+        }
+
+        if (!agent.isOnNavMesh)
+        {
+            Debug.LogWarning($"{name} → StartRoaming: NavMesh'e oturamadı!");
+            yield break;
+        }
+
+        Debug.Log($"{name} → StartRoaming: NavMesh hazır, random roam başlatılıyor.");
+        StartCoroutine(RandomRoamForSeconds(60));
+    }
+
 
     protected virtual void Update()
     {
-        
         if (isChasingCrowForJewelry)
         {
             Debug.Log($"{name} → Takip hâlâ devam ediyor mu?");
@@ -52,10 +90,13 @@ public abstract class BaseNPC : MonoBehaviour
                 StopChasingCrow();
             }
         }
-        CheckIfJewelryStolen(); // 💎 HER NPC için çalışsın
     }
 
-    protected virtual void CheckIfJewelryStolen() { }
+    protected virtual IEnumerator RandomRoamForSeconds(float duration)
+    {
+        Debug.LogWarning($"{name} → RandomRoamForSeconds() bu NPC türünde tanımlı değil.");
+        yield break;
+    }
 
     public virtual void TakeDamage(float amount)
     {
@@ -173,7 +214,7 @@ public abstract class BaseNPC : MonoBehaviour
     }
 
 
-    protected Vector3 GetRandomNavmeshPoint(float maxRadius = 10f, float minDistance = 0f)
+    protected Vector3 GetRandomNavmeshPoint(float maxRadius = 20f, float minDistance = 5f)
     {
         for (int i = 0; i < 20; i++)
         {
@@ -185,11 +226,19 @@ public abstract class BaseNPC : MonoBehaviour
                 continue;
 
             if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, maxRadius, NavMesh.AllAreas))
+            {
+                // 💡 Aşırı dik yüzeyleri eleyelim
+                if (Vector3.Angle(Vector3.up, hit.normal) > 35f)
+                    continue;
+
                 return hit.position;
+            }
         }
 
+        // ❌ Bulamazsa en azından mevcut pozisyonu dönsün
         return transform.position;
     }
+
 
     protected void StopAllAnimations()
     {
