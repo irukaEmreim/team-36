@@ -5,6 +5,18 @@ using System.Collections;
 using Microlight.MicroBar;
 
 public enum NPCReactionType { Flee, ChaseAndThrow }
+public static class AnimatorExtensions
+{
+    public static bool HasParameter(this Animator animator, string paramName)
+    {
+        foreach (AnimatorControllerParameter param in animator.parameters)
+        {
+            if (param.name == paramName)
+                return true;
+        }
+        return false;
+    }
+}
 
 [RequireComponent(typeof(NavMeshAgent), typeof(Animator))]
 public abstract class BaseNPC : MonoBehaviour
@@ -50,9 +62,17 @@ public abstract class BaseNPC : MonoBehaviour
         }
 
         if (!agent.isOnNavMesh)
-            Debug.LogError($"{name} → 5 saniye geçti ama hâlâ NavMesh'te değil!");
+        {
+            Debug.LogError($"{name} → 5 saniye geçti ama hâlâ NavMesh'te değil! Agent devre dışı bırakılıyor.");
+            agent.enabled = false;
+            yield break; // 💥 coroutine’i bitir
+        }
         else
+        {
             Debug.Log($"{name} → Artık NavMesh üzerinde. Hazır!");
+            yield return new WaitForSeconds(0.5f); // Sabitleşme süresi
+        }
+
     }
     public void StartRoaming()
     {
@@ -73,6 +93,14 @@ public abstract class BaseNPC : MonoBehaviour
             Debug.LogWarning($"{name} → StartRoaming: NavMesh'e oturamadı!");
             yield break;
         }
+        else
+        {
+            Debug.Log($"{name} → StartRoaming: NavMesh hazır, random roam başlatılıyor.");
+            yield return null; // ✅ Buraya ekle
+        }
+        StartCoroutine(RandomRoamForSeconds(60));
+
+
 
         Debug.Log($"{name} → StartRoaming: NavMesh hazır, random roam başlatılıyor.");
         StartCoroutine(RandomRoamForSeconds(60));
@@ -90,9 +118,12 @@ public abstract class BaseNPC : MonoBehaviour
                 StopChasingCrow();
             }
         }
+        if (IsStuck())
+            Debug.LogWarning($"{name} → NPC sıkışmış gibi gözüküyor!");
+
     }
 
-    protected virtual IEnumerator RandomRoamForSeconds(float duration)
+    public virtual IEnumerator RandomRoamForSeconds(float duration)
     {
         Debug.LogWarning($"{name} → RandomRoamForSeconds() bu NPC türünde tanımlı değil.");
         yield break;
@@ -121,7 +152,10 @@ public abstract class BaseNPC : MonoBehaviour
                 break;
         }
     }
+    
+    
 
+    
     protected IEnumerator FleeThenYell()
     {
         animator.SetBool("isRunning", true);
@@ -143,12 +177,18 @@ public abstract class BaseNPC : MonoBehaviour
 
         agent.ResetPath();
         animator.SetBool("isRunning", false);
-        animator.SetBool("isYelling", true);
-        yield return new WaitForSeconds(2f);
-        animator.SetBool("isYelling", false);
+
+        // ❗ "isYelling" parametresi varsa bağır, yoksa geç
+        if (animator.HasParameter("isYelling"))
+        {
+            animator.SetBool("isYelling", true);
+            yield return new WaitForSeconds(2f);
+            animator.SetBool("isYelling", false);
+        }
 
         isReacting = false;
     }
+
 
     protected IEnumerator ChaseThenThrow()
     {
@@ -213,6 +253,11 @@ public abstract class BaseNPC : MonoBehaviour
         }
     }
 
+    protected bool IsStuck()
+    {
+        return !agent.pathPending && !agent.hasPath && agent.remainingDistance == Mathf.Infinity;
+    }
+
 
     protected Vector3 GetRandomNavmeshPoint(float maxRadius = 20f, float minDistance = 5f)
     {
@@ -227,31 +272,47 @@ public abstract class BaseNPC : MonoBehaviour
 
             if (NavMesh.SamplePosition(candidate, out NavMeshHit hit, maxRadius, NavMesh.AllAreas))
             {
-                // 💡 Aşırı dik yüzeyleri eleyelim
                 if (Vector3.Angle(Vector3.up, hit.normal) > 35f)
                     continue;
 
-                return hit.position;
+                // ✅ PATH HESAPLAMA KISMI
+                NavMeshPath path = new NavMeshPath();
+                if (agent.CalculatePath(hit.position, path) && path.status == NavMeshPathStatus.PathComplete)
+                {
+                    return hit.position;
+                }
+                else
+                {
+                    Debug.LogWarning($"{name} → path.status = {path.status}, path çizilemedi!");
+                }
+
             }
         }
 
-        // ❌ Bulamazsa en azından mevcut pozisyonu dönsün
-        return transform.position;
+        Debug.LogWarning($"{name} → GetRandomNavmeshPoint başarısız oldu. Yakına fallback hedef atanıyor.");
+        return transform.position + transform.forward * 1.5f; // 1.5 birim ileri git
+
     }
+
 
 
     protected void StopAllAnimations()
     {
         animator.SetBool("isWalking", false);
         animator.SetBool("isRunning", false);
-        animator.SetBool("isYelling", false);
-        animator.SetBool("DoDance", false);
-        animator.SetBool("DoSelfCheck", false);
 
-        // animator.SetBool("throw", false); // ❌ BUNU BURADAN KALDIR
+        if (animator.HasParameter("isYelling"))
+            animator.SetBool("isYelling", false);
+
+        if (animator.HasParameter("DoDance"))
+            animator.SetBool("DoDance", false);
+
+        if (animator.HasParameter("DoSelfCheck"))
+            animator.SetBool("DoSelfCheck", false);
 
         agent.ResetPath();
     }
+
 
 
     protected abstract NPCReactionType GetReactionType();

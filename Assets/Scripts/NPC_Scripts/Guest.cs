@@ -81,6 +81,8 @@ public class Guest : BaseNPC
                 Debug.LogWarning($"{gameObject.name} → HipBone bulunamadı!");
         }
         StartCoroutine(WaitToEnableJewelryCheck());
+        StartCoroutine(RandomRoamForSeconds(30f));
+
        
 
 
@@ -462,16 +464,19 @@ public class Guest : BaseNPC
     {
         isBusy = true;
         Debug.Log($"{name} spora gidiyor.");
-        Vector3 sportArea = NoktaSpot.Instance.GetSportArea();
-        yield return MoveToTarget(sportArea);
+
+        Vector3 sportSpot = NoktaSpot.Instance.GetRandomPointInSportArea();
+        yield return MoveToTarget(sportSpot);
 
         animator.SetBool("DoExercise", true);
-        yield return new WaitForSeconds(30); // Spor süresini kısalt
+        yield return new WaitForSeconds(30); // Spor süresi
         animator.SetBool("DoExercise", false);
 
-        isBusy = false; // Kritik nokta: erken bırak
+        isBusy = false;
         Debug.Log($"{name} spor yaptı, serbest.");
     }
+
+
 
     IEnumerator GoToBreakfast()
     {
@@ -538,7 +543,7 @@ public class Guest : BaseNPC
         isBusy = false;
     }
 
-    protected override IEnumerator RandomRoamForSeconds(float duration)
+    public override IEnumerator RandomRoamForSeconds(float duration)
     {
         isBusy = true;
         float timer = duration;

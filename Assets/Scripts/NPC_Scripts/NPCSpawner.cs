@@ -3,7 +3,6 @@ using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.AI;
 
-
 public class NPCSpawner : MonoBehaviour
 {
     public GameObject[] baseCharacters;
@@ -22,66 +21,107 @@ public class NPCSpawner : MonoBehaviour
 
     void Awake()
     {
-        guestAnimator = Resources.Load<RuntimeAnimatorController>("SmartNPC_Animator");
+        guestAnimator = Resources.Load<RuntimeAnimatorController>("guest");
         employeeAnimator = Resources.Load<RuntimeAnimatorController>("Employee");
 
-        StartCoroutine(AssignRolesNextFrame());
+        StartCoroutine(InitializeSpawnSequence());
     }
 
-    IEnumerator AssignRolesNextFrame()
+    IEnumerator InitializeSpawnSequence()
     {
-        yield return null;
+        yield return new WaitForEndOfFrame();
         AssignRoleToScenePrefabs();
+        yield return new WaitForSeconds(0.5f);
+        yield return StartCoroutine(SpawnClonesSafely());
+        LogNPCCounts();
     }
 
-   void Start()
-{
-    int created = 0;
-    int guestCount = 0;
-    int employeeCount = 0;
-    int maxEmployees = Mathf.FloorToInt(totalCount * 0.2f);
-    int maxGuests = totalCount - maxEmployees;
-
-    int attempts = 0;
-    int maxAttempts = totalCount * 10;
-
-    while (created < totalCount && attempts < maxAttempts)
+    IEnumerator SpawnClonesSafely()
     {
-        attempts++;
+        int created = 0;
+        int guestCount = 0;
+        int employeeCount = 0;
+        int maxEmployees = Mathf.FloorToInt(totalCount * 0.2f);
+        int maxGuests = totalCount - maxEmployees;
 
-        int s = Random.Range(0, shirtMaterials.Length);
-        int h = Random.Range(0, hairMaterials.Length);
-        int p = Random.Range(0, pantsMaterials.Length);
-        int sk = Random.Range(0, skinMaterials.Length);
+        int attempts = 0;
+        int maxAttempts = totalCount * 10;
 
-        string comboKey = $"{s}_{h}_{p}_{sk}";
-        if (usedCombinations.Contains(comboKey))
-            continue;
-
-        usedCombinations.Add(comboKey);
-
-        Vector3 randomPoint = new Vector3(
-            Random.Range(-area.x / 2f, area.x / 2f),
-            0,
-            Random.Range(-area.y / 2f, area.y / 2f)
-        );
-
-        // 🔍 NavMesh kontrolü
-        if (!NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+        while (created < totalCount && attempts < maxAttempts)
         {
-            Debug.LogWarning($"❌ {randomPoint} → NavMesh dışında. Spawn atlandı.");
-            continue;
+            attempts++;
+
+            int s = Random.Range(0, shirtMaterials.Length);
+            int h = Random.Range(0, hairMaterials.Length);
+            int p = Random.Range(0, pantsMaterials.Length);
+            int sk = Random.Range(0, skinMaterials.Length);
+
+            string comboKey = $"{s}_{h}_{p}_{sk}";
+            if (usedCombinations.Contains(comboKey))
+                continue;
+
+            usedCombinations.Add(comboKey);
+
+            Vector3 randomPoint = new Vector3(
+                Random.Range(-13f, 40f),
+                3f,
+                Random.Range(-36f, -24f)
+            );
+
+            if (!NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+            {
+                Debug.LogWarning($"❌ {randomPoint} → NavMesh dışında. Spawn atlandı.");
+                continue;
+            }
+
+            GameObject chosen = baseCharacters[Random.Range(0, baseCharacters.Length)];
+            GameObject clone = Instantiate(chosen, hit.position, Quaternion.identity);
+
+            ApplyMaterials(clone, shirtMaterials[s], hairMaterials[h], pantsMaterials[p], skinMaterials[sk]);
+
+            Animator animator = clone.GetComponent<Animator>();
+            if (animator == null)
+                animator = clone.AddComponent<Animator>();
+
+            AssignRole(clone, ref guestCount, ref employeeCount, maxGuests, maxEmployees, animator);
+
+            if (clone.GetComponent<Guest>() != null)
+            {
+                float jewelryChance = 0.7f;
+                if (Random.value > jewelryChance)
+                {
+                    Transform[] allChildren = clone.GetComponentsInChildren<Transform>(true);
+                    foreach (Transform t in allChildren)
+                    {
+                        if (t.name.ToLower().Contains("diamond"))
+                        {
+                            Debug.Log($"{clone.name} → 💎 Elmas silindi (random disable).");
+                            Destroy(t.gameObject);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            created++;
+            yield return null;
         }
+    }
 
-        GameObject chosen = baseCharacters[Random.Range(0, baseCharacters.Length)];
-        GameObject clone = Instantiate(chosen, hit.position, Quaternion.identity);
-        ApplyMaterials(clone, shirtMaterials[s], hairMaterials[h], pantsMaterials[p], skinMaterials[sk]);
+    void AssignRole(GameObject clone, ref int guestCount, ref int employeeCount, int maxGuests, int maxEmployees, Animator animator)
+    {
+#if UNITY_EDITOR
+        DestroyImmediate(clone.GetComponent<Guest>());
+        DestroyImmediate(clone.GetComponent<HotelEmployee>());
+#else
+        var guest = clone.GetComponent<Guest>();
+        if (guest != null) Destroy(guest);
 
-        Animator animator = clone.GetComponent<Animator>();
-        if (animator == null)
-            animator = clone.AddComponent<Animator>();
+        var emp = clone.GetComponent<HotelEmployee>();
+        if (emp != null) Destroy(emp);
+#endif
 
-        if (employeeCount < maxEmployees && Random.value < 0.2f)
+        if (employeeCount < maxEmployees)
         {
             clone.AddComponent<HotelEmployee>();
             employeeCount++;
@@ -97,10 +137,17 @@ public class NPCSpawner : MonoBehaviour
             if (guestAnimator != null)
                 animator.runtimeAnimatorController = guestAnimator;
         }
-
-        created++;
     }
-}
+
+    void LogNPCCounts()
+    {
+        var allGuests = FindObjectsOfType<Guest>();
+        var allEmployees = FindObjectsOfType<HotelEmployee>();
+
+        int total = allGuests.Length + allEmployees.Length;
+
+        Debug.Log($"📊 Toplam NPC: {total} | 🧢 Guest: {allGuests.Length} | 💼 Employee: {allEmployees.Length}");
+    }
 
     void AssignRoleToScenePrefabs()
     {
@@ -108,20 +155,19 @@ public class NPCSpawner : MonoBehaviour
 
         int employeeCount = 0;
         int guestCount = 0;
-        int maxEmployees = Mathf.FloorToInt(totalCount * 0.2f); // %20 çalışan
+        int maxEmployees = Mathf.FloorToInt(totalCount * 0.2f);
 
         foreach (var ac in allInScene)
         {
             GameObject go = ac.gameObject;
 
-            // 1. Animator bileşeni yoksa ekle
+            if (go.scene.name != null && go.scene.name != gameObject.scene.name)
+                continue;
+
             Animator animator = go.GetComponent<Animator>();
             if (animator == null)
-            {
                 animator = go.AddComponent<Animator>();
-            }
 
-            // 2. Rol yoksa rol ver
             if (go.GetComponent<Guest>() == null && go.GetComponent<HotelEmployee>() == null)
             {
                 if (employeeCount < maxEmployees)
@@ -141,22 +187,16 @@ public class NPCSpawner : MonoBehaviour
                         animator.runtimeAnimatorController = guestAnimator;
                 }
             }
-
-            // 3. Rol zaten varsa → ona göre Animator ver (EKSTRA GÜVENLİK KATMANI)
             else
             {
-                if (go.GetComponent<HotelEmployee>() != null && animator != null && employeeAnimator != null)
-                {
+                if (go.GetComponent<HotelEmployee>() != null && employeeAnimator != null)
                     animator.runtimeAnimatorController = employeeAnimator;
-                }
-                else if (go.GetComponent<Guest>() != null && animator != null && guestAnimator != null)
-                {
+                else if (go.GetComponent<Guest>() != null && guestAnimator != null)
                     animator.runtimeAnimatorController = guestAnimator;
-                }
             }
         }
 
-        Debug.Log($"Sahnedeki prefablar: {employeeCount} çalışan, {guestCount} misafir.");
+        Debug.Log($"🧍 Elle sahneye konan prefablar: {employeeCount} çalışan, {guestCount} misafir.");
     }
 
     void ApplyMaterials(GameObject obj, Material shirtMat, Material hairMat, Material pantsMat, Material skinMat)
