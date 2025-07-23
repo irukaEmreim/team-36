@@ -17,6 +17,8 @@ TagManager:
   - Diamond
   - Stone
   - Thorn
+  - CurukMeyve
+  - Bee
   layers:
   - Default
   - TransparentFX
@@ -42,7 +44,7 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - Bee
   - Stealable
   - Grass
   - Pigeon

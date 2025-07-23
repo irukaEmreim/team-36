@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ad08e56404f896844a3d5d9cbb285c4b
+guid: aa601ffc098ae314692730bec0638d68
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable:
@@ -446,10 +446,17 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.8860498
-        functionName: ResetHopTrigger
+      - time: 0
+        functionName: NewEvent
         data: 
         objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.9222973
+        functionName: ResetHopTrigger
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 9dab36cb1f4ee0c489eba874f4b6d669, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0

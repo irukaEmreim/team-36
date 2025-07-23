@@ -1,0 +1,12 @@
+Bir objeyi itilebilir/Fırlatılabilir yapmak için 
+
+1. tag ve layer ayarla
+
+2. Rigidbody ekle (drag eklemeyi unutma durmaz yoksa)
+
+3. Item_Damage ekle
+
+Damage -> verdiği hasar
+
+Etki süresi (10 diyelim) -> İtildikten sonra yalnızca 10 saniye içerisinde birine temas ederse hasar verebilir.
+10 Saniye geçerse hasar vermez. 

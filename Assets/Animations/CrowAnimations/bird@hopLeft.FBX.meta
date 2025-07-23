@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 62f44b8db6c967743b7107b7e2f4c863
+guid: a728c105cdb6a0d4cb75537072dc7ef9
 ModelImporter:
   serializedVersion: 20200
   internalIDToNameTable:
@@ -437,19 +437,26 @@ ModelImporter:
       loopBlend: 0
       loopBlendOrientation: 1
       loopBlendPositionY: 1
-      loopBlendPositionXZ: 0
+      loopBlendPositionXZ: 1
       keepOriginalOrientation: 1
       keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
+      keepOriginalPositionXZ: 1
       heightFromFeet: 0
       mirror: 0
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
-      - time: 0.95710236
-        functionName: ResetHopTrigger
+      - time: 0
+        functionName: NewEvent
         data: 
         objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.9256757
+        functionName: ResetHopTrigger
+        data: 
+        objectReferenceParameter: {fileID: 11500000, guid: 9dab36cb1f4ee0c489eba874f4b6d669, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
