@@ -19,6 +19,7 @@ TagManager:
   - Thorn
   - CurukMeyve
   - Bee
+  - PoolFloor
   layers:
   - Default
   - TransparentFX

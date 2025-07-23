@@ -40,12 +40,18 @@ public class HotelEmployee : BaseNPC
         if (GameTimeManager.Instance != null)
         {
             GameTimeManager.OnMinuteChanged -= HandleMinuteChanged;
-
-
         }
     }
 
-    
+
+    private void OnDisable()
+    {
+        if (GameTimeManager.Instance != null)
+        {
+            GameTimeManager.OnMinuteChanged -= HandleMinuteChanged;
+        }
+    }
+
 
     protected override void Update()
     {
@@ -56,8 +62,13 @@ public class HotelEmployee : BaseNPC
 
     private void HandleMinuteChanged(int minute)
     {
+        if (this == null || gameObject == null) return; // ✅ Ölü referansa karşı önlem
+
+        if (!this.enabled) return; // Komponent devre dışıysa çalışmasın
+
         Debug.Log($"[EMPLOYEE] {name} dakika {minute} - aktivite: {GameTimeManager.Instance.CurrentActivity}");
     }
+
     public override IEnumerator RandomRoamForSeconds(float duration)
     {
         float timer = duration;
@@ -134,6 +145,13 @@ public class HotelEmployee : BaseNPC
             if (isReacting)
             {
                 yield return null;
+                continue;
+            }
+
+            if (GameTimeManager.Instance == null)
+            {
+                Debug.LogWarning($"{name} → GameTimeManager.Instance null! Schedule durdu.");
+                yield return new WaitForSeconds(1f);
                 continue;
             }
 

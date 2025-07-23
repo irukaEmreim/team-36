@@ -31,10 +31,14 @@ public class NPCSpawner : MonoBehaviour
     {
         yield return new WaitForEndOfFrame();
         AssignRoleToScenePrefabs();
+
         yield return new WaitForSeconds(0.5f);
-        yield return StartCoroutine(SpawnClonesSafely());
-        LogNPCCounts();
+
+        yield return StartCoroutine(SpawnClonesSafely()); // ✅ önce klonlar doğsun
+
+        LogNPCCounts(); // ✅ sonra tüm NPC'leri say
     }
+
 
     IEnumerator SpawnClonesSafely()
     {
@@ -62,11 +66,18 @@ public class NPCSpawner : MonoBehaviour
 
             usedCombinations.Add(comboKey);
 
-            Vector3 randomPoint = new Vector3(
-                Random.Range(-13f, 40f),
-                3f,
-                Random.Range(-36f, -24f)
-            );
+          /*  Vector3 randomPoint = new Vector3(
+                Random.Range(-area.x / 2f, area.x / 2f),
+                0,
+                Random.Range(-area.y / 2f, area.y / 2f)
+            )*/;
+          
+          Vector3 randomPoint = new Vector3(
+              Random.Range(-13f, 40f),
+              3f,
+              Random.Range(-36f, -24f)
+          );
+
 
             if (!NavMesh.SamplePosition(randomPoint, out NavMeshHit hit, 2f, NavMesh.AllAreas))
             {
@@ -76,6 +87,9 @@ public class NPCSpawner : MonoBehaviour
 
             GameObject chosen = baseCharacters[Random.Range(0, baseCharacters.Length)];
             GameObject clone = Instantiate(chosen, hit.position, Quaternion.identity);
+            // 🔥 Prefab’tan gelen Guest/HotelEmployee scriptlerini temizle
+            DestroyImmediate(clone.GetComponent<Guest>());
+            DestroyImmediate(clone.GetComponent<HotelEmployee>());
 
             ApplyMaterials(clone, shirtMaterials[s], hairMaterials[h], pantsMaterials[p], skinMaterials[sk]);
 
@@ -83,13 +97,41 @@ public class NPCSpawner : MonoBehaviour
             if (animator == null)
                 animator = clone.AddComponent<Animator>();
 
-            AssignRole(clone, ref guestCount, ref employeeCount, maxGuests, maxEmployees, animator);
+            // 1. Guest veya Employee zaten var mı kontrol et
+            if (clone.GetComponent<Guest>() == null && clone.GetComponent<HotelEmployee>() == null)
+            {
+                if (employeeCount < maxEmployees)
+                {
+                    clone.AddComponent<HotelEmployee>();
+                    employeeCount++;
 
+                    if (employeeAnimator != null)
+                        animator.runtimeAnimatorController = employeeAnimator;
+                }
+                else if (guestCount < maxGuests)
+                {
+                    clone.AddComponent<Guest>();
+                    guestCount++;
+
+                    if (guestAnimator != null)
+                        animator.runtimeAnimatorController = guestAnimator;
+                }
+            }
+            else
+            {
+                // Zaten varsa → güvenlik katmanı olarak animator’ı yine de set et
+                if (clone.GetComponent<HotelEmployee>() != null && employeeAnimator != null)
+                    animator.runtimeAnimatorController = employeeAnimator;
+                else if (clone.GetComponent<Guest>() != null && guestAnimator != null)
+                    animator.runtimeAnimatorController = guestAnimator;
+            }
+            
             if (clone.GetComponent<Guest>() != null)
             {
                 float jewelryChance = 0.7f;
                 if (Random.value > jewelryChance)
                 {
+                    // Elması bul ve yok et
                     Transform[] allChildren = clone.GetComponentsInChildren<Transform>(true);
                     foreach (Transform t in allChildren)
                     {
@@ -103,42 +145,13 @@ public class NPCSpawner : MonoBehaviour
                 }
             }
 
+
             created++;
-            yield return null;
+            yield return null; // 🔁 her doğumdan sonra 1 frame bekle
         }
+        
+
     }
-
-    void AssignRole(GameObject clone, ref int guestCount, ref int employeeCount, int maxGuests, int maxEmployees, Animator animator)
-    {
-#if UNITY_EDITOR
-        DestroyImmediate(clone.GetComponent<Guest>());
-        DestroyImmediate(clone.GetComponent<HotelEmployee>());
-#else
-        var guest = clone.GetComponent<Guest>();
-        if (guest != null) Destroy(guest);
-
-        var emp = clone.GetComponent<HotelEmployee>();
-        if (emp != null) Destroy(emp);
-#endif
-
-        if (employeeCount < maxEmployees)
-        {
-            clone.AddComponent<HotelEmployee>();
-            employeeCount++;
-
-            if (employeeAnimator != null)
-                animator.runtimeAnimatorController = employeeAnimator;
-        }
-        else if (guestCount < maxGuests)
-        {
-            clone.AddComponent<Guest>();
-            guestCount++;
-
-            if (guestAnimator != null)
-                animator.runtimeAnimatorController = guestAnimator;
-        }
-    }
-
     void LogNPCCounts()
     {
         var allGuests = FindObjectsOfType<Guest>();
@@ -148,6 +161,7 @@ public class NPCSpawner : MonoBehaviour
 
         Debug.Log($"📊 Toplam NPC: {total} | 🧢 Guest: {allGuests.Length} | 💼 Employee: {allEmployees.Length}");
     }
+
 
     void AssignRoleToScenePrefabs()
     {
@@ -161,6 +175,7 @@ public class NPCSpawner : MonoBehaviour
         {
             GameObject go = ac.gameObject;
 
+            // 💡 SADECE sahnedeki elle konmuş objelere uygula
             if (go.scene.name != null && go.scene.name != gameObject.scene.name)
                 continue;
 
@@ -198,6 +213,7 @@ public class NPCSpawner : MonoBehaviour
 
         Debug.Log($"🧍 Elle sahneye konan prefablar: {employeeCount} çalışan, {guestCount} misafir.");
     }
+
 
     void ApplyMaterials(GameObject obj, Material shirtMat, Material hairMat, Material pantsMat, Material skinMat)
     {

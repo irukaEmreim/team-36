@@ -21,6 +21,8 @@ public class Guest : BaseNPC
     private bool hasBeenInitialized = false;
     private Transform myDiamond;
     private bool hasBeenRobbed = false;
+    private bool isSwimming = false; // 🏊 Yüzme durumu kontrolü
+
 
 
 
@@ -60,7 +62,7 @@ public class Guest : BaseNPC
 
 
         base.Start();
-
+        animator.applyRootMotion = false; // 💥 Hareket NavMeshAgent'ten gelsin
         // Eğer zaten atanmadıysa, burada kesin atansın
        
 
@@ -110,11 +112,35 @@ public class Guest : BaseNPC
     {
         base.Update();
 
+        
         if (!isSitting && (isReacting || isGoingToMeal))
             return;
 
         CheckCrowProximity();
         CheckIfJewelryStolen(); // 💎 bu eklendi
+        
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 2f))
+        {
+            if (hit.collider.CompareTag("PoolFloor"))
+            {
+                if (!isSwimming)
+                {
+                    animator.SetBool("isSwimming", true);
+                    isSwimming = true;
+                    Debug.Log($"{name} yüzmeye başladı.");
+                }
+            }
+            else
+            {
+                if (isSwimming)
+                {
+                    animator.SetBool("isSwimming", false);
+                    isSwimming = false;
+                    Debug.Log($"{name} yüzmeyi bıraktı.");
+                }
+            }
+        }
     }
     void CheckIfJewelryStolen()
     {
@@ -465,16 +491,48 @@ public class Guest : BaseNPC
         isBusy = true;
         Debug.Log($"{name} spora gidiyor.");
 
-        Vector3 sportSpot = NoktaSpot.Instance.GetRandomPointInSportArea();
-        yield return MoveToTarget(sportSpot);
+        Bounds sportBounds = NoktaSpot.Instance.GetSportBounds();
 
+        // 10x10'luk alanda rastgele bir hedef noktası
+        Vector3 randomPos = sportBounds.center + new Vector3(
+            Random.Range(-sportBounds.extents.x, sportBounds.extents.x),
+            0f,
+            Random.Range(-sportBounds.extents.z, sportBounds.extents.z)
+        );
+
+        bool arrived = false;
+
+        // NavMesh kontrolü
+        if (NavMesh.SamplePosition(randomPos, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+        {
+            yield return MoveToTarget(hit.position);
+            arrived = true;
+        }
+        else
+        {
+            Debug.LogWarning($"{name} spor alanındaki hedef NavMesh dışında. Olduğu yerde spor yapacak.");
+        }
+
+        // Spor animasyonu başlat
         animator.SetBool("DoExercise", true);
         yield return new WaitForSeconds(30); // Spor süresi
         animator.SetBool("DoExercise", false);
 
         isBusy = false;
-        Debug.Log($"{name} spor yaptı, serbest.");
+        Debug.Log($"{name} spor yaptı {(arrived ? "ve hedefe ulaştı" : "ama oraya varamadı")}.");
     }
+
+    private Vector3 GetRandomPointInsideBounds(Bounds bounds)
+    {
+        Vector3 min = bounds.min;
+        Vector3 max = bounds.max;
+        return new Vector3(
+            Random.Range(min.x, max.x),
+            transform.position.y,
+            Random.Range(min.z, max.z)
+        );
+    }
+
 
 
 
@@ -512,9 +570,9 @@ public class Guest : BaseNPC
             Debug.Log($"{name} yüzmeye gidiyor.");
             Vector3 poolPos = NoktaSpot.Instance.GetPoolSpot();
             yield return MoveToTarget(poolPos);
-            animator.SetBool("DoSwim", true);
+            animator.SetBool("isSwimming", true);
             yield return new WaitForSeconds(120);
-            animator.SetBool("DoSwim", false);
+            animator.SetBool("isSwimming", false);
         }
         else
         {
@@ -524,9 +582,9 @@ public class Guest : BaseNPC
             {
                 Debug.Log($"{name} oturmaya gidiyor.");
                 yield return MoveToTarget(chair.position);
-                animator.SetBool("DoSit", true);
+                animator.SetBool("isSitting", true);
                 yield return new WaitForSeconds(120);
-                animator.SetBool("DoSit", false);
+                animator.SetBool("isSitting", false);
                 ChairManager.Instance.ReleaseChair(chair);
             }
         }
@@ -642,6 +700,25 @@ public class Guest : BaseNPC
         animator.SetBool("isWalking", false);
         
     }
+    
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("PoolFloor"))
+        {
+            animator.SetBool("isSwimming", true);
+            Debug.Log($"{name} havuza girdi. Yüzme animasyonu başladı.");
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("PoolFloor"))
+        {
+            animator.SetBool("isSwimming", false);
+            Debug.Log($"{name} havuzdan çıktı. Yüzme animasyonu durdu.");
+        }
+    }
+
     public override void StopChasingCrow()
     {
         base.StopChasingCrow();
