@@ -39,8 +39,8 @@ public abstract class BaseNPC : MonoBehaviour
         animator = GetComponent<Animator>();
 
         agent.autoBraking = false;
-        agent.angularSpeed = 1200f;
-        agent.acceleration = 40f;
+        agent.angularSpeed = 800f;
+        agent.acceleration = 20f;
 
         if (stressBar == null)
             stressBar = GetComponentInChildren<MicroBar>();
@@ -156,41 +156,14 @@ public abstract class BaseNPC : MonoBehaviour
     
 
     
-    protected IEnumerator FleeThenYell()
+    protected virtual IEnumerator FleeThenYell()
     {
-        animator.SetBool("isRunning", true);
-        agent.speed = (currentStress < maxStress * 0.5f) ? runSpeed * 2f : runSpeed;
-        Vector3 target = GetRandomNavmeshPoint(15f, 7f);
-        agent.SetDestination(target);
-
-        float timeElapsed = 0f;
-        float maxChaseTime = 3f;
-
-        while (timeElapsed < maxChaseTime)
-        {
-            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.2f)
-                break;
-
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        agent.ResetPath();
-        animator.SetBool("isRunning", false);
-
-        // ❗ "isYelling" parametresi varsa bağır, yoksa geç
-        if (animator.HasParameter("isYelling"))
-        {
-            animator.SetBool("isYelling", true);
-            yield return new WaitForSeconds(2f);
-            animator.SetBool("isYelling", false);
-        }
-
-        isReacting = false;
+        yield break;
     }
 
 
-    protected IEnumerator ChaseThenThrow()
+
+    protected virtual IEnumerator ChaseThenThrow()
     {
         GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
         if (crow == null)
@@ -363,10 +336,47 @@ public abstract class BaseNPC : MonoBehaviour
         StartCoroutine(ResumeRoamAfterCooldown());
     }
 
-    protected virtual IEnumerator ResumeRoamAfterCooldown()
+    
+    protected IEnumerator ResumeRoamAfterCooldown()
     {
-        yield break;
+        agent.isStopped = true;
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
+        agent.updatePosition = false;
+        agent.updateRotation = false;
+
+        // Güvenli pozisyon
+        Vector3 safePos = transform.position;
+        agent.Warp(safePos);
+
+        yield return new WaitForSeconds(0.2f); // Nefes arası
+
+        agent.isStopped = false;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+
+        // ❗ Warp sonrası bekleme ekle (Unity bug fix gibi)
+        yield return new WaitForSeconds(0.1f); 
+
+        // 🎯 Yeni hedef belirleme
+        Vector3 roamTarget = GetRandomNavmeshPoint(8f);
+        if (NavMesh.SamplePosition(roamTarget, out NavMeshHit hit, 2f, NavMesh.AllAreas))
+        {
+            agent.ResetPath();
+
+            agent.SetDestination(hit.position);
+            animator.SetBool("isWalking", true);
+        }
+        else
+        {
+            Debug.LogWarning($"{name} → Geçersiz roam hedefi! Hedef NavMesh dışı.");
+            yield break;
+        }
+
+        // 🔁 Gerçek roaming başlasın
+        yield return StartCoroutine(RandomRoamForSeconds(60));
     }
+
 
     protected bool isChasingCrowForJewelry = false;
     protected Coroutine jewelryChaseRoutine;

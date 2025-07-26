@@ -121,6 +121,7 @@ public class Guest : BaseNPC
         CheckIfJewelryStolen(); // 💎 bu eklendi
         Transform child = GetComponentInChildren<Transform>();
         RaycastHit hit;
+        Debug.DrawLine(child.position+Vector3.up*0.5f,(child.position+Vector3.up*0.5f)+Vector3.down*2f,Color.red);
         if (Physics.Raycast(child.position + Vector3.up * 0.5f, Vector3.down, out hit, 2f))
         {
             if (hit.collider.CompareTag("PoolFloor"))
@@ -368,6 +369,76 @@ public class Guest : BaseNPC
         base.TakeDamage(amount);
     }
     
+    protected override IEnumerator FleeThenYell()
+    {
+        Debug.Log($"{name} → [GUEST] Gaak'tan korktu, kaçıyor!");
+
+        animator.SetBool("isRunning", true);
+        agent.speed = (currentStress < maxStress * 0.5f) ? runSpeed * 2f : runSpeed;
+        Vector3 target = GetRandomNavmeshPoint(15f, 7f);
+        agent.SetDestination(target);
+
+        float timeElapsed = 0f;
+        float maxChaseTime = 3f;
+
+        while (timeElapsed < maxChaseTime)
+        {
+            if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.2f)
+                break;
+
+            timeElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
+        agent.isStopped = true;
+        agent.updatePosition = false;
+        agent.updateRotation = false;
+        animator.SetBool("isRunning", false);
+        animator.applyRootMotion = false;
+
+        Vector3 frozenPos = transform.position;
+        agent.Warp(frozenPos);
+
+        yield return new WaitForSeconds(0.05f);
+
+        animator.CrossFade("AngryYelling", 0.1f);
+
+        // ❗ STATE GEÇİŞİ BEKLE
+        yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).IsName("AngryYelling"));
+        Debug.Log($"{name} → Animator artık AngryYelling state'inde.");
+
+        // 🔥 ARTIK gerçek süreyi al
+        float yellDuration = animator.GetCurrentAnimatorStateInfo(0).length;
+        Debug.Log($"{name} → AngryYelling gerçek süresi: {yellDuration:F2}s");
+
+        float elapsed = 0f;
+        while (elapsed < yellDuration)
+        {
+            transform.position = frozenPos;
+            agent.nextPosition = frozenPos;
+            agent.Warp(frozenPos);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        isReacting = false;
+        agent.isStopped = false;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        animator.applyRootMotion = false;
+
+        Debug.Log($"{name} → [GUEST] Yell gerçekten bitti, roam başlıyor");
+
+        StartCoroutine(ResumeRoamAfterCooldown());
+    }
+
+
+
+
+
     private IEnumerator StandThenFlee()
     {
         Debug.Log($"{gameObject.name} oturuyordu ama stres yüksek → KAÇ!");
@@ -747,46 +818,7 @@ public class Guest : BaseNPC
 
 
 
-    protected override IEnumerator ResumeRoamAfterCooldown()
-    {
-        agent.isStopped = true;
-        agent.ResetPath();
-        agent.velocity = Vector3.zero;
-        agent.updatePosition = false;
-        agent.updateRotation = false;
-
-        // Güvenli pozisyon
-        Vector3 safePos = transform.position;
-        agent.Warp(safePos);
-
-        yield return new WaitForSeconds(0.2f); // Nefes arası
-
-        agent.isStopped = false;
-        agent.updatePosition = true;
-        agent.updateRotation = true;
-
-        // ❗ Warp sonrası bekleme ekle (Unity bug fix gibi)
-        yield return new WaitForSeconds(0.1f); 
-
-        // 🎯 Yeni hedef belirleme
-        Vector3 roamTarget = GetRandomNavmeshPoint(8f);
-        if (NavMesh.SamplePosition(roamTarget, out NavMeshHit hit, 2f, NavMesh.AllAreas))
-        {
-            agent.ResetPath();
-
-            agent.SetDestination(hit.position);
-            animator.SetBool("isWalking", true);
-        }
-        else
-        {
-            Debug.LogWarning($"{name} → Geçersiz roam hedefi! Hedef NavMesh dışı.");
-            yield break;
-        }
-
-        // 🔁 Gerçek roaming başlasın
-        yield return StartCoroutine(RandomRoamForSeconds(60));
-    }
-
+  
     
     protected override IEnumerator JewelryChase()
     {

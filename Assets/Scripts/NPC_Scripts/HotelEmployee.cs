@@ -84,9 +84,11 @@ public class HotelEmployee : BaseNPC
 
         Debug.Log($"[EMPLOYEE] {name} dakika {minute} - aktivite: {GameTimeManager.Instance.CurrentActivity}");
     }
+    private bool isBusy = false;
 
-    public override IEnumerator RandomRoamForSeconds(float duration)
+     public override IEnumerator RandomRoamForSeconds(float duration)
     {
+        isBusy = true;
         float timer = duration;
 
         while (timer > 0)
@@ -108,8 +110,8 @@ public class HotelEmployee : BaseNPC
 
                 if (!agent.hasPath)
                 {
-                  //  Debug.LogWarning($"{name} → Yol çizilemedi. agent.hasPath = false");
-                    continue;
+                    Debug.LogWarning($"{name} → Yol çizilemedi. agent.hasPath = false");
+                    continue; // Yeni hedef ara
                 }
 
                 agent.isStopped = false;
@@ -123,6 +125,7 @@ public class HotelEmployee : BaseNPC
                 continue;
             }
 
+            // Hedefe ulaşana kadar bekle
             float wait = 0f;
             float timeout = 3f;
 
@@ -130,28 +133,36 @@ public class HotelEmployee : BaseNPC
             {
                 if (agent.pathStatus == NavMeshPathStatus.PathInvalid || agent.pathStatus == NavMeshPathStatus.PathPartial)
                 {
-                 //   Debug.Log($"{name} → Patika geçersiz veya eksik. Yeni hedef deneniyor.");
+                    Debug.Log($"{name} → Patika geçersiz veya eksik. Yeni hedef deneniyor.");
                     break;
                 }
 
                 wait += Time.deltaTime;
                 if (wait > timeout)
                 {
-                   // Debug.Log($"{name} → Patika çok uzun sürdü. Hedef iptal ediliyor.");
+                    Debug.Log($"{name} → Patika çok uzun sürdü. Hedef iptal ediliyor.");
                     break;
                 }
 
                 yield return null;
             }
 
+
+
+            // Yürüyüş bittiğinde durdur
             agent.ResetPath();
             animator.SetBool("isWalking", false);
 
-            float idleTime = Random.Range(3f, 6f);
+            float idleTime = Random.Range(3f, 6f); // 🧘‍♂️ dinlenme süresi
             yield return new WaitForSeconds(idleTime);
             timer -= idleTime;
         }
+
+        isBusy = false;
     }
+
+
+
 
 
     private IEnumerator ExecuteDaySchedule()
@@ -250,4 +261,83 @@ public class HotelEmployee : BaseNPC
     {
         return NPCReactionType.ChaseAndThrow;
     }
+    
+    protected override IEnumerator ChaseThenThrow()
+    {
+        GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
+        if (crow == null)
+        {
+            isReacting = false;
+            yield break;
+        }
+
+        currentTarget = crow;
+        animator.SetBool("isRunning", true);
+
+        float chaseDuration = 4f;
+        float t = 0f;
+
+        while (t < chaseDuration && crow != null)
+        {
+            agent.SetDestination(crow.transform.position);
+            FaceTarget(crow);
+
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // ❄️ Sabitle
+        agent.ResetPath();
+        agent.velocity = Vector3.zero;
+        agent.isStopped = true;
+        agent.updatePosition = false;
+        agent.updateRotation = false;
+        animator.SetBool("isRunning", false);
+
+        Vector3 frozenPos = transform.position;
+        agent.Warp(frozenPos);
+
+        yield return new WaitForSeconds(0.05f); // buffer
+
+        // 🎯 Throw animasyonunu başlat
+        animator.SetBool("throw", true);
+        animator.CrossFade("throw", 0.1f);
+
+        // 🕒 Sabit süre: 3 saniye bekle
+        float throwDuration = 4f;
+        float elapsed = 0f;
+        while (elapsed < throwDuration)
+        {
+            transform.position = frozenPos;
+            agent.nextPosition = frozenPos;
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // 🔄 Bitti
+        animator.SetBool("throw", false);
+
+        yield return new WaitForSeconds(0.1f); // geçiş buffer
+
+        StopAllAnimations();
+
+        // 🔓 Agent tekrar aktif
+        agent.isStopped = false;
+        agent.updatePosition = true;
+        agent.updateRotation = true;
+        agent.nextPosition = frozenPos;
+
+        isReacting = false;
+        currentTarget = null;
+
+        Debug.Log($"{name} → Throw (3s) tamamlandı. Hayata dönüyor.");
+        StartCoroutine(ResumeRoamAfterCooldown());
+    }
+
+    
+
+
+
+
+
 }
