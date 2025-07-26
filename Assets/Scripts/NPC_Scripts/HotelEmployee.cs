@@ -10,9 +10,25 @@ public class HotelEmployee : BaseNPC
 
     protected override void Start()
     {
+       
         base.Start();
         StartCoroutine(DelayedInitialize());
+        
     }
+    private void RemoveDiamondIfExists()
+    {
+        Transform[] allChildren = GetComponentsInChildren<Transform>(true);
+        foreach (Transform t in allChildren)
+        {
+            if (t.name.ToLower().Contains("diamond"))
+            {
+                Destroy(t.gameObject); // ✅ elması sil
+              //  Debug.Log($"{name} → 💼 Employee'den elmas kaldırıldı.");
+                break;
+            }
+        }
+    }
+
     private IEnumerator DelayedInitialize()
     {
         // Diğer nesnelerin hazır olması için 1 frame bekle
@@ -20,13 +36,13 @@ public class HotelEmployee : BaseNPC
 
         // Her ihtimale karşı 0.5 saniye daha bekleyebilirsin
         yield return new WaitForSeconds(0.5f);
-
+        RemoveDiamondIfExists(); // 💎 Elmas varsa sil
         if (GameTimeManager.Instance != null)
         {
             GameTimeManager.OnMinuteChanged += HandleMinuteChanged;
 
             scheduledBehaviorRoutine = StartCoroutine(ExecuteDaySchedule());
-            Debug.Log($"{name} → ⏰ Zaman çizelgesine abone oldu.");
+           // Debug.Log($"{name} → ⏰ Zaman çizelgesine abone oldu.");
         }
         else
         {
@@ -92,7 +108,7 @@ public class HotelEmployee : BaseNPC
 
                 if (!agent.hasPath)
                 {
-                    Debug.LogWarning($"{name} → Yol çizilemedi. agent.hasPath = false");
+                  //  Debug.LogWarning($"{name} → Yol çizilemedi. agent.hasPath = false");
                     continue;
                 }
 
@@ -114,14 +130,14 @@ public class HotelEmployee : BaseNPC
             {
                 if (agent.pathStatus == NavMeshPathStatus.PathInvalid || agent.pathStatus == NavMeshPathStatus.PathPartial)
                 {
-                    Debug.Log($"{name} → Patika geçersiz veya eksik. Yeni hedef deneniyor.");
+                 //   Debug.Log($"{name} → Patika geçersiz veya eksik. Yeni hedef deneniyor.");
                     break;
                 }
 
                 wait += Time.deltaTime;
                 if (wait > timeout)
                 {
-                    Debug.Log($"{name} → Patika çok uzun sürdü. Hedef iptal ediliyor.");
+                   // Debug.Log($"{name} → Patika çok uzun sürdü. Hedef iptal ediliyor.");
                     break;
                 }
 

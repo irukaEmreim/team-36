@@ -54,7 +54,7 @@ public class Guest : BaseNPC
             }
         }
         if (myDiamond != null)
-            Debug.Log($"{name} → Elmas bulundu: {myDiamond.name}");
+           Debug.Log($"{name} → Elmas bulundu: {myDiamond.name}");
         else
             Debug.LogWarning($"{name} → Elmas bulunamadı! Kovalamayı asla başlatamaz.");
 
@@ -110,6 +110,7 @@ public class Guest : BaseNPC
 
     protected override void Update()
     {
+        
         base.Update();
 
         
@@ -118,9 +119,9 @@ public class Guest : BaseNPC
 
         CheckCrowProximity();
         CheckIfJewelryStolen(); // 💎 bu eklendi
-        
+        Transform child = GetComponentInChildren<Transform>();
         RaycastHit hit;
-        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out hit, 2f))
+        if (Physics.Raycast(child.position + Vector3.up * 0.5f, Vector3.down, out hit, 2f))
         {
             if (hit.collider.CompareTag("PoolFloor"))
             {

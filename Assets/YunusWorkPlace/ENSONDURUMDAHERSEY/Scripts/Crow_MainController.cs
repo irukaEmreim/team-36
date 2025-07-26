@@ -45,7 +45,7 @@ public class Crow_MainController : Crow_Base
         crowThrowItem = GetComponent<Crow_ThrowItem>();
         if (main_camera != null)
         {
-            print("KAMERA ATANDI");
+       //     print("KAMERA ATANDI");
             SetCameraTransform(main_camera);
             foreach (var mod in GetComponents<Crow_Base>())
                 mod.SetCameraTransform(cameraTransform);
@@ -154,7 +154,7 @@ public class Crow_MainController : Crow_Base
 
         if (!isGrounded)
         {
-            print("NASIL LO");
+         //   print("NASIL LO");
             animator.SetBool("Flying", true);
             if (crowFlight.canFreeFly == false && crowFlight.isFlightStarted)
             {
@@ -165,7 +165,7 @@ public class Crow_MainController : Crow_Base
         }
         else
         {
-            print("Şİmdi mi");
+         //   print("Şİmdi mi");
             currentState = CrowState.GroundMovement;
             crowFlight.EndFlight();
             animator.SetBool("Flying", false);

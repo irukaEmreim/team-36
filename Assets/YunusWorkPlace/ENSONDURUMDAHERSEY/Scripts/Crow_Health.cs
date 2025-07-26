@@ -22,7 +22,7 @@ public class Crow_Health : Crow_Base
     private void Update()
     {
         UpdateHealthVisual();
-        print(currentHealth);
+      //  print(currentHealth);
         if (Input.GetKeyDown(KeyCode.T))
         {
             TakeDamage(15);

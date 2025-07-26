@@ -40,7 +40,7 @@ public class Item_FollowPlayer : MonoBehaviour
         }
         else
         {
-            print("Taş Tasinacak Yerler Atanmamis");
+          //  print("Taş Tasinacak Yerler Atanmamis");
         }
     }
 

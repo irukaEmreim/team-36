@@ -69,7 +69,7 @@ public abstract class BaseNPC : MonoBehaviour
         }
         else
         {
-            Debug.Log($"{name} → Artık NavMesh üzerinde. Hazır!");
+           // Debug.Log($"{name} → Artık NavMesh üzerinde. Hazır!");
             yield return new WaitForSeconds(0.5f); // Sabitleşme süresi
         }
 
@@ -95,14 +95,14 @@ public abstract class BaseNPC : MonoBehaviour
         }
         else
         {
-            Debug.Log($"{name} → StartRoaming: NavMesh hazır, random roam başlatılıyor.");
+          //  Debug.Log($"{name} → StartRoaming: NavMesh hazır, random roam başlatılıyor.");
             yield return null; // ✅ Buraya ekle
         }
         StartCoroutine(RandomRoamForSeconds(60));
 
 
 
-        Debug.Log($"{name} → StartRoaming: NavMesh hazır, random roam başlatılıyor.");
+       // Debug.Log($"{name} → StartRoaming: NavMesh hazır, random roam başlatılıyor.");
         StartCoroutine(RandomRoamForSeconds(60));
     }
 
@@ -322,11 +322,19 @@ public abstract class BaseNPC : MonoBehaviour
         GameObject crow = GameObject.FindGameObjectWithTag("lb_bird");
         if (crow == null) return false;
 
-        CrowCollect cc = crow.GetComponent<CrowCollect>();
-        if (cc == null || cc.collectedDiamond == null) return false;
+        Crow_Collect cc = crow.GetComponent<Crow_Collect>();
+        if (cc == null) return false;
 
-        return IsMyDiamondStolen(cc.collectedDiamond);
+        // Eğer karga hâlâ bir elmas taşıyorsa → kovalamaya devam
+        if (cc.collectedDiamond != null)
+        {
+            return true;
+        }
+
+        // Kargada elmas yok → bırak takibi
+        return false;
     }
+
 
     protected bool IsMyDiamondStolen(GameObject diamond)
     {
