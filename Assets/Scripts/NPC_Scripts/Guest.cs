@@ -110,36 +110,35 @@ public class Guest : BaseNPC
 
     protected override void Update()
     {
-        
         base.Update();
-
-        
-        if (!isSitting && (isReacting || isGoingToMeal))
+    
+        if (!isSitting && (isReacting || isGoingToMeal || isBusy))
             return;
 
         CheckCrowProximity();
-        CheckIfJewelryStolen(); // 💎 bu eklendi
-        Transform child = GetComponentInChildren<Transform>();
-        RaycastHit hit;
-        Debug.DrawLine(child.position+Vector3.up*0.5f,(child.position+Vector3.up*0.5f)+Vector3.down*2f,Color.red);
-        if (Physics.Raycast(child.position + Vector3.up * 0.5f, Vector3.down, out hit, 2f))
+        CheckIfJewelryStolen();
+    
+        // Better swimming detection
+        if (Physics.Raycast(transform.position + Vector3.up * 0.5f, Vector3.down, out var hit, 2f))
         {
-            if (hit.collider.CompareTag("PoolFloor"))
+            bool nowInPool = hit.collider.CompareTag("PoolFloor");
+        
+            if (nowInPool != isSwimming)
             {
-                if (!isSwimming)
-                {
-                    animator.SetBool("isSwimming", true);
-                    isSwimming = true;
-                    Debug.Log($"{name} yüzmeye başladı.");
-                }
-            }
-            else
-            {
+                isSwimming = nowInPool;
+                animator.SetBool("isSwimming", isSwimming);
+            
                 if (isSwimming)
                 {
-                    animator.SetBool("isSwimming", false);
-                    isSwimming = false;
-                    Debug.Log($"{name} yüzmeyi bıraktı.");
+                    // Adjust speed for swimming
+                    agent.speed = normalSpeed * 0.7f;
+                    Debug.Log($"{name} havuza girdi. Yüzme animasyonu başladı.");
+                }
+                else
+                {
+                    // Reset to normal speed
+                    agent.speed = normalSpeed;
+                    Debug.Log($"{name} havuzdan çıktı. Yüzme animasyonu durdu.");
                 }
             }
         }
@@ -222,7 +221,7 @@ public class Guest : BaseNPC
         return time != GameTimeManager.MealTime.None && Random.value < 0.005f;
     }
 
-    private IEnumerator GoSitAndEatRoutine()
+   private IEnumerator GoSitAndEatRoutine()
     {
         isGoingToMeal = true;
         Debug.Log($"🍽 {gameObject.name} → {GameTimeManager.Instance.CurrentMealTime} zamanı, yemeğe gidiyor.");
@@ -526,6 +525,7 @@ public class Guest : BaseNPC
             }
 
             Debug.Log($"📊 Şu anki istatistik: Toplam Guest: {totalGuests} — Sporcular: {sportLovers}");
+            
         }
         if (minute == 2)
         {
@@ -536,10 +536,9 @@ public class Guest : BaseNPC
         }
         else if (minute >= 3 && minute < 5)
         {
-            if (chance < 0.8f)
+            
                 StartCoroutine(GoToPoolOrSit());
-            else
-                StartCoroutine(RandomRoamForSeconds(120));
+           
         }
         else if (minute == 5)
         {
@@ -608,62 +607,211 @@ public class Guest : BaseNPC
 
 
 
-    IEnumerator GoToBreakfast()
+ 
+    void OnDrawGizmosSelected()
     {
-        isBusy = true;
-        Debug.Log($"{name} kahvaltıya gidiyor.");
-
-        var animCtrl = GetComponent<AnimationControl>();
-        if (animCtrl != null)
-            animCtrl.isExternallyControlled = true;
-
-        // Mevcut oturma sistemini kullan:
-        yield return StartCoroutine(GoSitAndEatRoutine());
-
-        if (animCtrl != null)
+        if (NoktaSpot.Instance != null)
         {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(NoktaSpot.Instance.GetPoolSpot(), NoktaSpot.Instance.poolAreaSize);
+        }
+    }
+
+  // Replace these three methods:
+IEnumerator GoToBreakfast()
+{
+    isBusy = true;
+    Debug.Log($"{name} kahvaltıya gidiyor.");
+    yield return StartCoroutine(GoSitAndEatMeal("Breakfast"));
+    isBusy = false;
+}
+
+IEnumerator GoToLunch()
+{
+    isBusy = true;
+    Debug.Log($"{name} öğle yemeğine gidiyor.");
+    yield return StartCoroutine(GoSitAndEatMeal("Lunch"));
+    isBusy = false;
+}
+
+IEnumerator GoToDinner()
+{
+    isBusy = true;
+    Debug.Log($"{name} akşam yemeğine gidiyor.");
+    yield return StartCoroutine(GoSitAndEatMeal("Dinner"));
+    isBusy = false;
+}
+
+private IEnumerator GoSitAndEatMeal(string mealType)
+{
+    var animCtrl = GetComponent<AnimationControl>();
+    if (animCtrl != null) 
+        animCtrl.isExternallyControlled = true;
+
+    // Get chair for the specific meal area
+    myChair = ChairManager.Instance.GetAvailableChair(mealType);
+    if (myChair == null)
+    {
+        Debug.Log($"{name} → {mealType} için boş sandalye bulamadı!");
+        if (animCtrl != null) 
             animCtrl.isExternallyControlled = false;
-            animCtrl.SendMessage("StartNextAction");
-        }
-
-        isBusy = false;
+        yield break;
     }
 
-    IEnumerator GoToLunch() => GoToBreakfast(); // aynı yapı
+    // Move to chair
+    agent.ResetPath();
+    agent.SetDestination(myChair.position);
+    agent.isStopped = false;
+    animator.SetBool("isWalking", true);
 
-    IEnumerator GoToDinner() => GoToBreakfast();
+    // Wait until reached chair (with smaller distance threshold)
+    while (Vector3.Distance(transform.position, myChair.position) > 0.3f)
+        yield return null;
 
-    IEnumerator GoToPoolOrSit()
+    // Proper sitting alignment
+    agent.ResetPath();
+    agent.isStopped = true;
+    agent.updatePosition = false;
+    agent.updateRotation = false;
+
+    // Calculate precise sitting position
+    Vector3 sitPosition = myChair.position;
+    if (hipBone != null)
     {
-        isBusy = true;
-        if (Random.value < 0.5f)
-        {
-            // Havuz
-            Debug.Log($"{name} yüzmeye gidiyor.");
-            Vector3 poolPos = NoktaSpot.Instance.GetPoolSpot();
-            yield return MoveToTarget(poolPos);
-            animator.SetBool("isSwimming", true);
-            yield return new WaitForSeconds(120);
-            animator.SetBool("isSwimming", false);
-        }
-        else
-        {
-            // Sandalye
-            Transform chair = ChairManager.Instance.GetAvailableChair();
-            if (chair != null)
-            {
-                Debug.Log($"{name} oturmaya gidiyor.");
-                yield return MoveToTarget(chair.position);
-                animator.SetBool("isSitting", true);
-                yield return new WaitForSeconds(120);
-                animator.SetBool("isSitting", false);
-                ChairManager.Instance.ReleaseChair(chair);
-            }
-        }
-
-        isBusy = false;
+        Vector3 hipOffset = transform.position - hipBone.position;
+        hipOffset.y = Mathf.Clamp(hipOffset.y, 0.1f, 0.3f); // Tighter vertical clamp
+        sitPosition += hipOffset;
+        
+        // Additional forward adjustment if needed
+        sitPosition += myChair.forward * -0.1f; // Slight backward adjustment
+    }
+    else
+    {
+        sitPosition += new Vector3(0f, 0.35f, -0.1f); // Fallback with slight backward
     }
 
+    // Apply position and rotation
+    transform.position = sitPosition;
+    transform.rotation = myChair.rotation;
+
+    // Start sitting animations
+    animator.SetBool("isWalking", false);
+    animator.SetBool("isSitting", true);
+    animator.SetBool("SittingTalk", true);
+    isSitting = true;
+
+    Debug.Log($"🪑 {gameObject.name} {mealType} için oturdu. ({myChair.name})");
+
+    // Eat for duration
+    yield return new WaitForSeconds(60f);
+
+    // Stand up
+    animator.SetBool("SittingTalk", false);
+    animator.SetBool("isSitting", false);
+    animator.SetTrigger("doStand");
+
+    // Wait for stand animation
+    yield return new WaitUntil(() => 
+        !animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand"));
+
+    // Clean up
+    isSitting = false;
+    ChairManager.Instance.ReleaseChair(myChair, mealType);
+    myChair = null;
+
+    agent.Warp(transform.position);
+    agent.isStopped = false;
+    agent.updatePosition = true;
+    agent.updateRotation = true;
+
+    if (animCtrl != null)
+    {
+        animCtrl.isExternallyControlled = false;
+        animCtrl.SendMessage("StartNextAction");
+    }
+}
+    
+    IEnumerator GoToPoolOrSit()
+   {
+    isBusy = true;
+    
+    // 80% chance to swim, 20% to sit
+    if (Random.value < 0.8f)
+    {
+        // Swimming behavior
+        Debug.Log($"{name} yüzmeye gidiyor.");
+        
+        // Get pool bounds and a random point within them
+        Bounds poolBounds = NoktaSpot.Instance.GetPoolBounds();
+        Vector3 swimTarget = GetRandomPointInsideBounds(poolBounds);
+        
+        // Move to pool edge first
+        Vector3 poolEdge = poolBounds.ClosestPoint(transform.position);
+        yield return MoveToTarget(poolEdge);
+        
+        // Enter pool and start swimming
+        agent.speed = normalSpeed * 0.7f; // Slow down for swimming
+        animator.SetBool("isSwimming", true);
+        isSwimming = true;
+        
+        // Swim around for duration
+        float swimTime = 120f;
+        float swimTimer = 0f;
+        
+        while (swimTimer < swimTime)
+        {
+            // Every 10-15 seconds, pick a new spot in the pool
+            if (swimTimer % Random.Range(10f, 15f) < Time.deltaTime)
+            {
+                swimTarget = GetRandomPointInsideBounds(poolBounds);
+                agent.SetDestination(swimTarget);
+            }
+            
+            swimTimer += Time.deltaTime;
+            yield return null;
+        }
+        
+        // Exit pool
+        animator.SetBool("isSwimming", false);
+        isSwimming = false;
+        agent.speed = normalSpeed; // Reset to normal speed
+    }
+    else
+    {
+        // Existing sitting behavior...
+        Transform chair = ChairManager.Instance.GetAvailableChair();
+        if (chair != null)
+        {
+            Debug.Log($"{name} oturmaya gidiyor.");
+            yield return MoveToTarget(chair.position);
+            
+            // Handle sitting alignment
+            if (hipBone != null)
+            {
+                Vector3 offset = transform.position - hipBone.position;
+                offset.y = Mathf.Clamp(offset.y, 0.1f, 0.6f);
+                transform.position = chair.position + offset;
+            }
+            
+            transform.rotation = chair.rotation;
+            animator.SetBool("isSitting", true);
+            
+            // Sit for duration
+            yield return new WaitForSeconds(120f);
+            
+            animator.SetBool("isSitting", false);
+            animator.SetTrigger("doStand");
+            
+            // Wait for stand animation
+            yield return new WaitUntil(() => 
+                !animator.GetCurrentAnimatorStateInfo(0).IsName("SitToStand"));
+            
+            ChairManager.Instance.ReleaseChair(chair);
+        }
+    }
+
+    isBusy = false;
+   }
     IEnumerator GoInside()
     {
         isBusy = true;
@@ -773,23 +921,10 @@ public class Guest : BaseNPC
         
     }
     
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("PoolFloor"))
-        {
-            animator.SetBool("isSwimming", true);
-            Debug.Log($"{name} havuza girdi. Yüzme animasyonu başladı.");
-        }
-    }
+    
+    
 
-    private void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("PoolFloor"))
-        {
-            animator.SetBool("isSwimming", false);
-            Debug.Log($"{name} havuzdan çıktı. Yüzme animasyonu durdu.");
-        }
-    }
+   
 
     public override void StopChasingCrow()
     {
