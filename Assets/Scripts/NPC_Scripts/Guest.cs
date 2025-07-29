@@ -29,7 +29,7 @@ public class Guest : BaseNPC
     protected void Awake()
     {
         totalGuests++;
-        prefersSport = Random.value < 0.8f;
+        prefersSport = Random.value < 0.65;
 
         if (prefersSport) sportLovers++;
         else sportAvoiders++;

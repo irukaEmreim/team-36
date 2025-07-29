@@ -35,7 +35,7 @@ public class Crow_MainController : Crow_Base
     }
 
     private CrowState currentState;
-
+    private GakTimer gakTimer;
     protected override void Awake()
     {
         base.Awake(); // Crow_Base bileşenleri
@@ -43,9 +43,10 @@ public class Crow_MainController : Crow_Base
         crowFlight = GetComponent<Crow_Flight>();
         crowDirectAttack = GetComponent<Crow_DirectAttack>();
         crowThrowItem = GetComponent<Crow_ThrowItem>();
+        gakTimer = GetComponent<GakTimer>();
         if (main_camera != null)
         {
-       //     print("KAMERA ATANDI");
+            //     print("KAMERA ATANDI");
             SetCameraTransform(main_camera);
             foreach (var mod in GetComponents<Crow_Base>())
                 mod.SetCameraTransform(cameraTransform);
@@ -102,10 +103,10 @@ public class Crow_MainController : Crow_Base
             crowThrowItem.ThrowItem();
         }
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            crowDirectAttack.GakAttack();
-        }
+        //if (Input.GetMouseButtonDown(0) && gakTimer.canGak)
+        //{
+        //    crowDirectAttack.GakAttack();
+        //}
     }
 
     private void HandleMovement()

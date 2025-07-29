@@ -200,7 +200,8 @@ public class HotelEmployee : BaseNPC
                     break;
 
                 case GameTimeManager.DayActivity.PoolOrSit:
-                    MoveNear(NoktaSpot.Instance.GetPoolSpot(), 8f);
+                    //MoveNear(NoktaSpot.Instance.GetPoolSpot(), 8f);
+                    StartRoaming();
                     break;
 
                 case GameTimeManager.DayActivity.Lunch:
