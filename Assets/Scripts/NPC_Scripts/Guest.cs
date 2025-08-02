@@ -731,8 +731,8 @@ private IEnumerator GoSitAndEatMeal(string mealType)
     }
 }
     
-    IEnumerator GoToPoolOrSit()
-   {
+   IEnumerator GoToPoolOrSit()
+{
     isBusy = true;
     
     // 80% chance to swim, 20% to sit
@@ -771,10 +771,20 @@ private IEnumerator GoSitAndEatMeal(string mealType)
             yield return null;
         }
         
-        // Exit pool
+        // Exit pool properly
+        Vector3 exitPoint = GetPoolExitPoint(poolBounds);
+        yield return MoveToTarget(exitPoint);
+        
+        // Reset swimming state
         animator.SetBool("isSwimming", false);
         isSwimming = false;
         agent.speed = normalSpeed; // Reset to normal speed
+        
+        // Ensure we're actually out of the pool
+        while (isSwimming) // In case the raycast hasn't updated yet
+        {
+            yield return null;
+        }
     }
     else
     {
@@ -811,7 +821,29 @@ private IEnumerator GoSitAndEatMeal(string mealType)
     }
 
     isBusy = false;
-   }
+    
+    // After swimming or sitting, check if it's time for a meal
+    if (GameTimeManager.Instance.CurrentActivity == GameTimeManager.DayActivity.Lunch ||
+        GameTimeManager.Instance.CurrentActivity == GameTimeManager.DayActivity.Dinner)
+    {
+        if (GameTimeManager.Instance.CurrentActivity == GameTimeManager.DayActivity.Lunch)
+        {
+            StartCoroutine(GoToLunch());
+        }
+        else
+        {
+            StartCoroutine(GoToDinner());
+        }
+    }
+}
+
+private Vector3 GetPoolExitPoint(Bounds poolBounds)
+{
+    // Get a point on the edge of the pool in the direction away from center
+    Vector3 directionFromCenter = (transform.position - poolBounds.center).normalized;
+    directionFromCenter.y = 0;
+    return poolBounds.center + directionFromCenter * (poolBounds.extents.magnitude + 1f);
+}
     IEnumerator GoInside()
     {
         isBusy = true;
