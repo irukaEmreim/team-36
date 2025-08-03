@@ -181,6 +181,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozk
 
 ## [SPRINT NOTLARI]
 + Sprint review ve retrospective toplantısının 03.08.2025 Pazar tarihinde yapılması planlanmıştır.
++ Sprint süresinde oyunun raporda yazdığı şekliyle her biri 3 gün ve toplam 3 seviyeden oluşan, seviye atladıkça zorluk seviyesi artan full versiyonunun değil ilk seviye içerisindeki bir günlük kısa bir demo versiyonunun teslim edilmesine karar verilmiştir. Bu demo versiyon tek bir gün içerisinde tüm müşteri ve yöneticilerin otelden kaçırılmasının hedeflendiği 10 dakikalık bir deneyim olacaktır.
 
 ## [SPRINT İÇİNDE TAMAMLANMASI HEDEFLENEN PUAN]
 + Sprint 3 için tamamlanması hedeflenen puan 33 olarak belirlenmiştir.
@@ -196,7 +197,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozk
 
 ## [SPRINT BOARD UPDATE]
 Sprint 3 Miro Board Screenshot
-+ ![Sprint2Board](xxx.jpg)
++ ![Sprint2Board](Sprint3Board.jpg)
 
 ## [ÜRÜN DURUMU]
 
@@ -209,7 +210,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozk
 
 ## [SPRINT RETROSPECTIVE]
 Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozkurt
-![Sprint3RetrospectiveBoard](xxx.jpg)
+![Sprint3RetrospectiveBoard](Sprint3Retrospective.jpg)
 
 ### Continue
 + Sprintin ilk 2 gününü bug fix için ayırmak geriye kalan tasklerin ilerleyişine katkıda bulundu
