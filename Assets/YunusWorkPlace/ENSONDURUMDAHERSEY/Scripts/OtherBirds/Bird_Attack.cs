@@ -22,7 +22,7 @@ public ParticleSystem pigeonPoopEffect;
         foreach (var item in npcs)
         {
             print(item.gameObject.name + "Pisle Altına ");
-            item.GetComponent<BaseNPC>().TakeDamage(damage); //BÖYLELİ BİR ŞEY OLACAK
+            item.GetComponent<NPC_Base_Test>().TakeDamage(damage); //BÖYLELİ BİR ŞEY OLACAK
             npcTriggered = false;
         }
     }

@@ -118,7 +118,7 @@ public class Bee_Controller : MonoBehaviour
         Collider[] hitNPCs = Physics.OverlapSphere(transform.position, patrolZoneCheckRadius, LayerMask.GetMask("NPC"));
         foreach (var npc in hitNPCs)
         {
-            npc.GetComponent<BaseNPC>()?.TakeDamage((int)zoneDamage);
+            npc.GetComponent<NPC_Base_Test>()?.TakeDamage((int)zoneDamage);
         }
     }
 
@@ -169,7 +169,7 @@ public class Bee_Controller : MonoBehaviour
         Collider[] hitNPCs = Physics.OverlapSphere(transform.position, npcHasarVermeAlani, LayerMask.GetMask("NPC"));
         foreach (var npc in hitNPCs)
         {
-            npc.GetComponent<BaseNPC>()?.TakeDamage((int)chaseIndirectDamage);
+            npc.GetComponent<NPC_Base_Test>()?.TakeDamage((int)chaseIndirectDamage);
         }
     }
 

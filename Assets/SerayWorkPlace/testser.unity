@@ -4342,6 +4342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  isDied: 0
   fallableLayer:
     serializedVersion: 2
     m_Bits: 536870912
@@ -4359,6 +4360,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  isDied: 0
   healthIcon: {fileID: 1211245764}
 --- !u!114 &69843073
 MonoBehaviour:
@@ -4373,6 +4375,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  isDied: 0
   throwForce: 16
 --- !u!114 &69843074
 MonoBehaviour:
@@ -4387,6 +4390,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  isDied: 0
   rayOriginTransform: {fileID: 1441501812}
   rayDistance: 1.5
   collectableLayer:
@@ -4413,11 +4417,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a29c122caf93e4743a5a1e6c8d053f83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
   audioClips:
   - {fileID: 8300000, guid: e2622b95524aab94b9a0448a1a4c6fc8, type: 3}
   - {fileID: 8300000, guid: aa29893140715234fa4c6f0f17bc3d88, type: 3}
   humans: []
+  audioSource: {fileID: 0}
 --- !u!114 &69843076
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4431,6 +4435,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  isDied: 0
   targetFlyHeight: 0.4
   takeoffSpeed: 5
   flightSpeed: 10
@@ -4451,6 +4456,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  isDied: 0
   moveSpeed: 4
   hopCoolDown: 1
   hopForce: 3.5
@@ -4468,6 +4474,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+  isDied: 0
   groundCheckDistance: 1
   groundLayer:
     serializedVersion: 2
@@ -4653,6 +4660,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gakMaterial: {fileID: 2100000, guid: 4f612d6855c2da84a8826b0cac3dfb43, type: 2}
   cooldownTime: 10
+  crow_DirectAttack: {fileID: 0}
   pulseDuration: 0.3
   pulseIntensity: 0.1
 --- !u!1 &70243698
@@ -5254,7 +5262,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8781ed4635cc22348b3c69eb0a9fdfa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lastReportedMinute: -1
+  dayProgress: 0
   dayDurationInSeconds: 600
+  timer: 0
+  <CurrentActivity>k__BackingField: 7
+  <CurrentMealTime>k__BackingField: 0
 --- !u!1 &88860826 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 9de20884058aa0a4dafedf287459c41b, type: 3}
@@ -16705,7 +16718,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 319374757}
-  m_LocalRotation: {x: 0.06915848, y: -0.000000004291296, z: 2.9749178e-10, w: 0.9976057}
+  m_LocalRotation: {x: 0.06915848, y: 0.000000004291296, z: -2.9749178e-10, w: 0.9976057}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -24105,6 +24118,8 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 17f1bd9c4bd45454ebf9855e7dfda148, type: 2}
   - {fileID: 2100000, guid: f8709670b974bb34b9bb5bde311063da, type: 2}
   - {fileID: 2100000, guid: 6b57555aa8704c14a8af79bd0146a466, type: 2}
+  guestAnimator: {fileID: 0}
+  employeeAnimator: {fileID: 0}
 --- !u!1 &462150189
 GameObject:
   m_ObjectHideFlags: 0
@@ -28896,6 +28911,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1440338d5f73a82429f90c2be545a4d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pigeonNearby: 0
+  npc: {fileID: 0}
 --- !u!136 &555910811
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -42586,6 +42603,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1440338d5f73a82429f90c2be545a4d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pigeonNearby: 0
+  npc: {fileID: 0}
 --- !u!136 &850141463
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -42947,6 +42966,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1440338d5f73a82429f90c2be545a4d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pigeonNearby: 0
+  npc: {fileID: 0}
 --- !u!136 &856179930
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -47243,8 +47264,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 54}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 0, y: 98.4}
+  m_SizeDelta: {x: 160, y: 83.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &939719554
 MonoBehaviour:
@@ -79546,6 +79567,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1440338d5f73a82429f90c2be545a4d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pigeonNearby: 0
+  npc: {fileID: 0}
 --- !u!136 &1550664967
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -95341,12 +95364,19 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  left: {fileID: 0}
+  right: {fileID: 0}
+  center: {fileID: 0}
+  rb: {fileID: 0}
+  collider: {fileID: 0}
   crowCollect: {fileID: 0}
   isTransforming: 0
   isCollected: 0
   carryingIndex: -1
   crowFlight: {fileID: 0}
   player: {fileID: 0}
+  itemVel: 0
+  yineDeneme: 0
   realTag: Thorn
 --- !u!65 &1893338497
 BoxCollider:
@@ -101911,8 +101941,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 0, y: -12.2}
+  m_SizeDelta: {x: 160, y: 76.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2011816052
 MonoBehaviour:
@@ -102584,6 +102614,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1440338d5f73a82429f90c2be545a4d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pigeonNearby: 0
+  npc: {fileID: 0}
 --- !u!136 &2016421312
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -107737,6 +107769,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1440338d5f73a82429f90c2be545a4d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pigeonNearby: 0
+  npc: {fileID: 0}
 --- !u!136 &2115816990
 CapsuleCollider:
   m_ObjectHideFlags: 0

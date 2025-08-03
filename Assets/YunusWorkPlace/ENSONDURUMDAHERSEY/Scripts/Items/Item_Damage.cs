@@ -32,12 +32,12 @@ public class Item_Damage : MonoBehaviour
             {
                 if (isPushed)
                 {
-                    other.gameObject.GetComponent<BaseNPC>().TakeDamage(damage);
+                    other.gameObject.GetComponent<NPC_Base_Test>().TakeDamage(damage);
                 }
             }
             else
             {
-                other.gameObject.GetComponent<BaseNPC>().TakeDamage(damage);
+                other.gameObject.GetComponent<NPC_Base_Test>().TakeDamage(damage);
             }
         }
     }
@@ -50,12 +50,12 @@ public class Item_Damage : MonoBehaviour
             {
                 if (isPushed)
                 {
-                    collision.gameObject.GetComponent<BaseNPC>().TakeDamage(damage);
+                    collision.gameObject.GetComponent<NPC_Base_Test>().TakeDamage(damage);
                 }
             }
             else
             {
-                collision.gameObject.GetComponent<BaseNPC>().TakeDamage(damage);
+                collision.gameObject.GetComponent<NPC_Base_Test>().TakeDamage(damage);
             }
         }
     }

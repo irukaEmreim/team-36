@@ -42,7 +42,7 @@ public class Crow_Collect : Crow_Base
             {
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    PrepareItem(hit);
+                    
 
                     switch (tag)
                     {
@@ -52,11 +52,13 @@ public class Crow_Collect : Crow_Base
                                 {
                                     DropEverything();
                                     CollectStone(hit.transform.gameObject);
+                                    PrepareItem(hit);
                                 }
                                 else
                                 {
                                     print("DOĞRU YERDEYİZ");
                                     CollectStone(hit.transform.gameObject);
+                                    PrepareItem(hit);
                                 }
                             else
                                 Debug.Log("Maksimum taş kapasitesine ulaşıldı.");
@@ -64,17 +66,20 @@ public class Crow_Collect : Crow_Base
 
                         case "Diamond":
                             DropEverything(); // öncekileri bırak
+                            PrepareItem(hit);
                             collectedDiamond = hit.transform.gameObject;
                             CollectGeneric(collectedDiamond);
                             break;
 
                         case "Thorn":
                             DropEverything(); // öncekileri bırak
+                            PrepareItem(hit);
                             collectedThorn = hit.transform.gameObject;
                             CollectGeneric(collectedThorn);
                             break;
                         case "CurukMeyve":
                             DropEverything();
+                            PrepareItem(hit);
                             collectedCurukMeyve = hit.transform.gameObject;
                             CollectGeneric(collectedCurukMeyve);
                             break;

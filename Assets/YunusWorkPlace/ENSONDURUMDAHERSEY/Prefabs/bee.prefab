@@ -620,7 +620,7 @@ GameObject:
   - component: {fileID: 7008834738344160283}
   - component: {fileID: -4951932205729654481}
   - component: {fileID: 5326007062304204081}
-  m_Layer: 0
+  m_Layer: 24
   m_Name: bee
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -656,16 +656,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 8
   damageInterval: 1
-  zoneDamage: 20
+  zoneDamage: 5
   chaseDamage: 5
   chaseIndirectDamage: 15
   patrolZoneCheckRadius: 6
   orbitRadius: 1.5
   orbitInterval: 1.5
   npcHasarVermeAlani: 1.5
-  followDuration: 5
+  followDuration: 10
   deathEffectPrefab: {fileID: 9021024968765140062, guid: d96190bdce3255e4a97f045d7eba93c5, type: 3}
-  zoneDuration: 10
+  zoneDuration: 5
 --- !u!65 &7008834738344160283
 BoxCollider:
   m_ObjectHideFlags: 0

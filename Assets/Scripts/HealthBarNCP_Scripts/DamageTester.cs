@@ -1,5 +1,5 @@
 using UnityEngine;
-
+/*
 public class DamageTester : MonoBehaviour
 {
     public float testDamageAmount = 10f;
@@ -12,11 +12,11 @@ public class DamageTester : MonoBehaviour
 
             foreach (BaseNPC npc in allNPCs)
             {
-                if (npc is Guest guest)
+                if (npc is NPC_Guest guest)
                 {
                     guest.TakeDamage(testDamageAmount);
                 }
-                else if (npc is HotelEmployee employee)
+                else if (npc is NPC_Employee employee)
                 {
                     employee.TakeDamage(testDamageAmount);
                 }
@@ -30,3 +30,4 @@ public class DamageTester : MonoBehaviour
         }
     }
 }
+*/

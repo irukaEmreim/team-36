@@ -50,7 +50,7 @@ public class cutscene : MonoBehaviour
         }
 
         // Şimdi geçebiliriz
-        SceneManager.LoadScene("testser");
+        SceneManager.LoadScene("day-1");
     }
 
     IEnumerator FadeImage(float from, float to)

@@ -21,12 +21,12 @@ public class Crow_Health : Crow_Base
 
     private void Update()
     {
-        UpdateHealthVisual();
       //  print(currentHealth);
         if (Input.GetKeyDown(KeyCode.T))
         {
             TakeDamage(15);
         }
+        UpdateHealthVisual();
     }
 
     private void UpdateHealthVisual()

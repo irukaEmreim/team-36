@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Crow_DirectAttack : Crow_Base
+public class Crow_DirectAttack : MonoBehaviour
 {
     [Header("Gak Ayarları")]
     public AudioClip[] audioClips;
     public List<GameObject> humans = new List<GameObject>();
+    public AudioSource audioSource;
+
 
 
     public void GakAttack()
@@ -23,7 +25,7 @@ public class Crow_DirectAttack : Crow_Base
         {
             if (human != null)
             {
-                human.GetComponent<BaseNPC>()?.TakeDamage(15);
+                human.GetComponent<NPC_Base_Test>()?.TakeDamage(15);
                 Debug.Log($"{human.name} 15 hasar aldı!");
             }
         }
@@ -31,6 +33,7 @@ public class Crow_DirectAttack : Crow_Base
 
     private void OnTriggerEnter(Collider other)
     {
+        print("AHA ADAM");
         if (other.CompareTag("Human") && !humans.Contains(other.gameObject))
         {
             humans.Add(other.gameObject);

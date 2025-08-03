@@ -127,8 +127,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.70808, y: 0.6680532, z: 0.82240665}
-  m_Center: {x: 0.006307377, y: 0.0866041, z: -0.004408009}
+  m_Size: {x: 0.70807993, y: 1.0090079, z: 0.82240665}
+  m_Center: {x: 0.0063073635, y: 0.25708148, z: -0.004408007}
 --- !u!96 &4381016833416843491
 TrailRenderer:
   serializedVersion: 2
@@ -247,6 +247,7 @@ MonoBehaviour:
   carryingIndex: -1
   realTag: CurukMeyve
   someTimesTriggerCollider: {fileID: 4381016833416843503}
+  owner: {fileID: 0}
 --- !u!114 &4381016833416843490
 MonoBehaviour:
   m_ObjectHideFlags: 0

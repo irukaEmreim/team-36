@@ -1,77 +1,88 @@
 using UnityEngine;
 using System.Collections;
-using NPC_Scripts;
 
 public class DynamicMusicManager : MonoBehaviour
 {
     public AudioSource musicSource;
 
-    public AudioClip morningMusic; // Roaming + Sport + Breakfast
+    public AudioClip morningMusic;
+    public AudioClip breakfastMusic;
     public AudioClip poolMusic1;
     public AudioClip lunchMusic;
-    public AudioClip poolMusic2;
     public AudioClip dinnerMusic;
-    public AudioClip breakfastMusic;
+    public AudioClip poolMusic2;
 
-    private GameTimeManager.DayActivity lastActivity;
+    public float timer = 0f;
     private Coroutine fadeCoroutine;
+    private int currentPhase = -1; // -1 başlatıcı değer
 
     void Start()
     {
-        lastActivity = GameTimeManager.DayActivity.None;
         musicSource.loop = true;
         musicSource.playOnAwake = false;
+
+
+        AudioClip firstClip = GetClipForPhase(0);
+    if (firstClip != null)
+    {
+        musicSource.clip = firstClip;
+        musicSource.volume = 1f;
+        musicSource.Play();
+        currentPhase = 0;
+        Debug.Log("Başlangıç müziği başlatıldı: " + firstClip.name);
+    }
+
     }
 
     void Update()
     {
-        var current = GameTimeManager.Instance.CurrentActivity;
-        if (current != lastActivity)
+        timer += Time.deltaTime;
+        SwitchMusicForActivity();
+    }
+
+    void SwitchMusicForActivity()
+    {
+        int newPhase = GetCurrentPhase();
+
+        if (newPhase != currentPhase)
         {
-            lastActivity = current;
-            SwitchMusicForActivity(current);
+            currentPhase = newPhase;
+
+            AudioClip newClip = GetClipForPhase(currentPhase);
+            if (newClip != null && musicSource.clip != newClip)
+            {
+                if (fadeCoroutine != null)
+                    StopCoroutine(fadeCoroutine);
+
+                fadeCoroutine = StartCoroutine(FadeToNewClip(newClip));
+            }
         }
     }
 
-    void SwitchMusicForActivity(GameTimeManager.DayActivity activity)
+    int GetCurrentPhase()
     {
-        AudioClip newClip = null;
-        float currentTime = GameTimeManager.Instance.CurrentTime;
+        float t = timer;
 
-        // 0-2dk arası sabah müziği
-        if (currentTime < 120f)
+        if (t < 120f) return 0;
+        else if (t < 180f) return 1;
+        else if (t < 240f) return 2;
+        else if (t < 300f) return 3;
+        else if (t < 360f) return 4;
+        else if (t < 480f) return 5;
+        else return 0;
+    }
+
+    AudioClip GetClipForPhase(int phase)
+    {
+        switch (phase)
         {
-            newClip = morningMusic;
-        }
-        else
-        {
-            switch (activity)
-            {
-                case GameTimeManager.DayActivity.Breakfast:
-                    newClip = breakfastMusic; // Artık ayrı kahvaltı müziği
-                    break;
-
-                case GameTimeManager.DayActivity.PoolOrSit:
-                    newClip = (currentTime < 360f) ? poolMusic1 : poolMusic2;
-                    break;
-
-                case GameTimeManager.DayActivity.Lunch:
-                    newClip = lunchMusic;
-                    break;
-
-                case GameTimeManager.DayActivity.Dinner:
-                    newClip = dinnerMusic;
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        if (newClip != null && musicSource.clip != newClip)
-        {
-            if (fadeCoroutine != null) StopCoroutine(fadeCoroutine);
-            fadeCoroutine = StartCoroutine(FadeToNewClip(newClip));
+            case 0: return morningMusic;
+            case 1: return breakfastMusic;
+            case 2: return poolMusic1;
+            case 3: return lunchMusic;
+            case 4: return dinnerMusic;
+            case 5: return poolMusic2;
+            default: return null;
         }
     }
 
@@ -83,7 +94,7 @@ public class DynamicMusicManager : MonoBehaviour
         // Fade out
         for (float t = 0; t < fadeOutDuration; t += Time.deltaTime)
         {
-            musicSource.volume = Mathf.Lerp(1f, 0f, t / fadeOutDuration);
+            musicSource.volume = Mathf.Lerp(0.2f, 0f, t / fadeOutDuration);
             yield return null;
         }
 
@@ -94,10 +105,10 @@ public class DynamicMusicManager : MonoBehaviour
         // Fade in
         for (float t = 0; t < fadeInDuration; t += Time.deltaTime)
         {
-            musicSource.volume = Mathf.Lerp(0f, 1f, t / fadeInDuration);
+            musicSource.volume = Mathf.Lerp(0f, 0.2f, t / fadeInDuration);
             yield return null;
         }
 
-        musicSource.volume = 1f;
+        musicSource.volume = 0.2f;
     }
 }

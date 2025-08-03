@@ -14,7 +14,7 @@ public class Crow_Base : MonoBehaviour
     protected Animator animator;
     protected Rigidbody rb;
     protected AudioSource audioSource;
-    protected bool isDied = false;
+    public bool isDied = false;
     [HideInInspector] protected Transform cameraTransform;
 
     protected virtual void Awake()
@@ -35,18 +35,34 @@ public class Crow_Base : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         if (currentHealth <= 0)
         {
+            isDied = true;
             Die();
         }
     }
 
     public virtual void Die()
     {
-        animator.SetBool("Die", true);
-        rb.isKinematic = true;
-        rb.useGravity = true;
+        // stop feeding into any more movement
+    isDied = true;
+    animator.SetTrigger("Die");
 
-        isDied = true;
-        enabled = false;
+    // make sure physics is driving us again
+    rb.isKinematic = false;
+    rb.useGravity  = true;
+
+    // allow falling, but optionally lock rotation so it doesn't tumble
+    rb.constraints = RigidbodyConstraints.FreezeRotation;
+
+    // disable all of your crow‐movement scripts
+    enabled = false; // disables Crow_Base itself
+    foreach (var comp in new MonoBehaviour[] {
+        GetComponent<Crow_MainController>(),
+        GetComponent<Crow_GroundMovement>(),
+        GetComponent<Crow_Flight>(),
+        GetComponent<Crow_ThrowItem>(),
+        GetComponent<GakTimer>()
+    })
+        if (comp != null) comp.enabled = false;
     }
 
     public int GetCurrentHealth() => currentHealth;

@@ -48,6 +48,7 @@ public class Item_FollowPlayer : MonoBehaviour
     private float maxTimer = 20f;
     private float _timer = 0f;
     private bool startTimer = false;
+    public GameObject owner;
     private void Update()
     {
         velocityMagnitude = rb.velocity.magnitude;
@@ -77,8 +78,22 @@ public class Item_FollowPlayer : MonoBehaviour
             }
         }
 
+        if (this.gameObject.CompareTag("Diamond") && isCollected)
+        {
+            var guestRoutine = owner.GetComponent<GuestDailyRoutine>();
+            if (guestRoutine != null)
+                guestRoutine.OnDiamondStolen();
+
+            cancelCollected();
+        }
+
     }
 
+    private IEnumerator cancelCollected()
+    {
+        yield return new WaitForSeconds(8);
+        isCollected = false;
+    }
 
     private void LateUpdate()
     {

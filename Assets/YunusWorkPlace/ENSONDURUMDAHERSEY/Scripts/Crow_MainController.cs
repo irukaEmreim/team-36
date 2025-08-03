@@ -5,12 +5,10 @@ using UnityEngine;
 
 [RequireComponent(typeof(Crow_GroundMovement))]
 [RequireComponent(typeof(Crow_Flight))]
-[RequireComponent(typeof(Crow_DirectAttack))]
 public class Crow_MainController : Crow_Base
 {
     private Crow_GroundMovement crowGroundMovement;
     private Crow_Flight crowFlight;
-    private Crow_DirectAttack crowDirectAttack;
     private Crow_ThrowItem crowThrowItem;
 
 
@@ -41,7 +39,6 @@ public class Crow_MainController : Crow_Base
         base.Awake(); // Crow_Base bileşenleri
         crowGroundMovement = GetComponent<Crow_GroundMovement>();
         crowFlight = GetComponent<Crow_Flight>();
-        crowDirectAttack = GetComponent<Crow_DirectAttack>();
         crowThrowItem = GetComponent<Crow_ThrowItem>();
         gakTimer = GetComponent<GakTimer>();
         if (main_camera != null)
@@ -103,10 +100,7 @@ public class Crow_MainController : Crow_Base
             crowThrowItem.ThrowItem();
         }
 
-        //if (Input.GetMouseButtonDown(0) && gakTimer.canGak)
-        //{
-        //    crowDirectAttack.GakAttack();
-        //}
+
     }
 
     private void HandleMovement()
@@ -186,7 +180,18 @@ public class Crow_MainController : Crow_Base
             }
         }
     }
+private void OnCollisionEnter(Collision col)
+{
+    // only care if we're already dead
+    if (!isDied) return;
 
+    // did we hit “ground”?
+    if (((1 << col.gameObject.layer) & groundLayer) != 0)
+    {
+        // lock *everything* so we don’t slide or bounce
+        rb.constraints = RigidbodyConstraints.FreezeAll;
+    }
+}
     public CrowState GetState() => currentState;
 }
 

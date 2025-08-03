@@ -127,8 +127,8 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.04922952, y: 0.044928703, z: 0.07887947}
-  m_Center: {x: 0.0002903172, y: -0.0008094268, z: 0.032134634}
+  m_Size: {x: 0.07432504, y: 0.076250054, z: 0.10972745}
+  m_Center: {x: 0.0017021811, y: -0.003754467, z: 0.04755862}
 --- !u!96 &3056299602084363071
 TrailRenderer:
   serializedVersion: 2
@@ -249,6 +249,7 @@ MonoBehaviour:
   carryingIndex: -1
   realTag: Stone
   someTimesTriggerCollider: {fileID: 2063125480713178882}
+  owner: {fileID: 0}
 --- !u!114 &3128084224902593765
 MonoBehaviour:
   m_ObjectHideFlags: 0

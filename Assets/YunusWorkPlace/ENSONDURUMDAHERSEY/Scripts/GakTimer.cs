@@ -8,14 +8,11 @@ public class GakTimer : MonoBehaviour
     [SerializeField] private Material gakMaterial;
     [SerializeField] private float cooldownTime = 10f;
     private float currentCooldown = 0f;
-    private Crow_DirectAttack crow_DirectAttack;
+    public Crow_DirectAttack crow_DirectAttack;
     private float pulseTime = 0f;
     [SerializeField] private float pulseDuration = 0.3f;
     [SerializeField] private float pulseIntensity = 0.1f;
-    void Awake()
-    {
-        crow_DirectAttack = GetComponent<Crow_DirectAttack>();
-    }
+
     private void Update()
     {
          // Gak giriş kontrolü
