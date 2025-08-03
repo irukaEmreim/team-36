@@ -68,6 +68,7 @@ CROWEL: Grudge Has Wings, bir 3D stealth-strategy aksiyon oyunu olarak oyuncular
 + Sprint review ve retrospective toplantısının 07.07.2025 Pazartesi tarihinde yapılması planlanmıştır.
 ## [SPRINT İÇİNDE TAMAMLANMASI HEDEFLENEN PUAN]
 + Sprint 1 için tamamlanması hedeflenen puan 28 olarak belirlenmiştir.
++ Sprint sonunda tamamlanan puan 28 olmuş ve tüm taskler yerine getirilmiştir.
 ## [PUAN TAMAMLAMA MANTIĞI]
 + Görevler (To-Do) listelendikten sonra hepsine kolaydan zora doğru 1, 2 ve 3 şeklinde rakamlar atanmıştır ve bu rakamlar tüm görevler için zorluk ifade eden birer "tag" haline gelmiştir.
 + Görevlere verilen "tag"lerin toplamı, sprint içerisinde tamamlanması hedeflenen puana dönüşmüştür.
@@ -122,6 +123,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 
 ## [SPRINT İÇİNDE TAMAMLANMASI HEDEFLENEN PUAN]
 + Sprint 2 için tamamlanması hedeflenen puan 38 olarak belirlenmiştir.
++ Sprint sonunda tamamlanan puan 38 olmuş ve tüm taskler yerine getirilmiştir.
 
 ## [PUAN TAMAMLAMA MANTIĞI]
 + Görevler (To-Do) listelendikten sonra hepsine kolaydan zora doğru 1, 2 ve 3 şeklinde rakamlar atanmıştır ve bu rakamlar tüm görevler için zorluk ifade eden birer "tag" haline gelmiştir.
@@ -185,6 +187,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozk
 
 ## [SPRINT İÇİNDE TAMAMLANMASI HEDEFLENEN PUAN]
 + Sprint 3 için tamamlanması hedeflenen puan 33 olarak belirlenmiştir.
++ Sprint sonunda tamamlanan puan 28 olmuş ve iki task yerine getirilememiştir. İlgili taskler Sprint Notları bölümünde belirtmiş olduğumuz demo versiyon sunumu kararıyla oyunun gelecekteki geliştirme hedeflerine ertelenmiştir.
 
 ## [PUAN TAMAMLAMA MANTIĞI]
 + Görevler (To-Do) listelendikten sonra hepsine kolaydan zora doğru 1, 2 ve 3 şeklinde rakamlar atanmıştır ve bu rakamlar tüm görevler için zorluk ifade eden birer "tag" haline gelmiştir.
