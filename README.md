@@ -207,6 +207,22 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozk
 + Sprint oldukça verimli geçmiştir. Sprintin ilk iki günü önceki sprintlerden kalan bug fixlere odaklanılmış ve bu gelecek taskler için hız kazandırmıştır.
 + Sprintte bazı optional extra tasks kolonundaki görevler dışındaki taskler tamamlanmıştır. Takım developerları oynanabilir seviyeyi bitirmiş ve çok iyi bir iş çıkarmıştır.
 
+## [SPRINT RETROSPECTIVE]
+Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozkurt
+![Sprint3RetrospectiveBoard](xxx.jpg)
+
+### Continue
++ Sprintin ilk 2 gününü bug fix için ayırmak geriye kalan tasklerin ilerleyişine katkıda bulundu
+   
+### Stop
++ Tüm süreç genelinde önceliklendirme iyi yapılsa da bazı aksillikler esnasında daha hızlı aksiyon alınabilir ve devam edilebilirdi
+  
+### Invent
++ Çalışma esnasında ekip üyelerinin uygunluklarında göre sık sık ilgili platformlarda çalışmalarını online olarak aynı anda yürütmeleri  motivasyon açısından faydalı olabilirdi.
+  
+### Act
++ Bu sprintte oyunun oynanabilir ve hatasız ilk halini oluşturmaya odaklanıldı, sonrasında oyunda arzu edilen eklemeler ve detaylandırmalarla uğraşılabilir.
+
 
 # [FİNAL NOTLAR]
 Oyunumuzda çoğunlukla hazır assetler kullanıldı. Kullanılan assetlerin linklerine oyun raporumuzun en güncel halinden veya Miro içerisinde assete ait task açıklamasından ulaşabilirsiniz.
