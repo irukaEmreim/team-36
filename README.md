@@ -203,13 +203,19 @@ Sprint 3 Miro Board Screenshot
 + ![Sprint2Board](Sprint3Board.jpg)
 
 ## [ÜRÜN DURUMU]
++ ![SonDurum1](SonDurum1.gif)
++ ![SonDurum2](SonDurum2.gif)
++ ![SonDurum3](SonDurum3.jpeg)
++ ![SonDurum4](SonDurum4.jpeg)
++ ![SonDurum5](SonDurum5.jpeg)
+
 
 ## [SPRINT REVIEW]
 Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozkurt
 
 + Bu sprint takımda genel bug fix yapılması, sahne tasarımda detaylandırmaları, ses/müzik entegrasyonu, UI tasarım ve kodlamaları, seviye ve zorluk akışının finalize edilmesi, ve teslime hazırlık şeklinde ilerlemiştir.
 + Sprint oldukça verimli geçmiştir. Sprintin ilk iki günü önceki sprintlerden kalan bug fixlere odaklanılmış ve bu gelecek taskler için hız kazandırmıştır.
-+ Sprintte bazı optional extra tasks kolonundaki görevler dışındaki taskler tamamlanmıştır. Takım developerları oynanabilir seviyeyi bitirmiş ve çok iyi bir iş çıkarmıştır.
++ Sprintte bazı optional extra tasks kolonundaki görevler ve seviye akışı ile alakalı taskler dışındaki taskler tamamlanmıştır. Takım developerları oynanabilir demo bir günü bitirmiştir, build alarak test etmiştir.
 
 ## [SPRINT RETROSPECTIVE]
 Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozkurt
