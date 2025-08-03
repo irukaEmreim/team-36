@@ -130,7 +130,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 ## [DAILY SCRUM]
 + Görüşmeler çoğunlukla Whatsapp üzerinden yapılmıştır.
 + Gerekli durumlarda Slack takım kanalımızda huddle toplantıları düzenlenmiştir.
-+ [Daily Scrum Messages via Drive](https://drive.google.com/drive/u/0/folders/10LfuCgrbaLYTVLfsbcvQqqjbHifXQap7)
++ [Daily Scrum Messages via Drive](https://drive.google.com/drive/u/0/folders/1xYb3a4rtWt4xwZlZz4yqL-SRoMPNk0e6)
 
 ## [SPRINT BOARD UPDATE]
 Sprint 2 Miro Board Screenshot
@@ -192,7 +192,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozk
 ## [DAILY SCRUM]
 + Görüşmeler çoğunlukla Whatsapp üzerinden yapılmıştır.
 + Gerekli durumlarda Slack takım kanalımızda huddle toplantıları düzenlenmiştir.
-+ [Daily Scrum Messages via Drive](https://drive.google.com/drive/u/0/folders/10LfuCgrbaLYTVLfsbcvQqqjbHifXQap7)
++ [Daily Scrum Messages via Drive](https://drive.google.com/drive/u/0/folders/1rvPKH6RRTtVppndhbMsxSW8BOLNF3Lk4)
 
 ## [SPRINT BOARD UPDATE]
 Sprint 3 Miro Board Screenshot
