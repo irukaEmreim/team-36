@@ -9,7 +9,7 @@ public class menuscript : MonoBehaviour
 {
     public void PlayGame()
     {
-        SceneManager.LoadScene("testser");
+        SceneManager.LoadScene("story");
     }
 
     public void QuitGame()

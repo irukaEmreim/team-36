@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/222/MainManu.unity
     guid: 0b6fc93add8651f42a6e374bb503cc30
   - enabled: 1
+    path: Assets/story.unity
+    guid: bb0844664e9c22b4b807a0359bfbeb96
+  - enabled: 1
     path: Assets/SerayWorkPlace/testser.unity
     guid: fa241fc3066964e4e9c4d2b2eebfc03d
   m_configObjects: {}
