@@ -134,7 +134,7 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Umut Başa
 
 ## [SPRINT BOARD UPDATE]
 Sprint 2 Miro Board Screenshot
-+ ![Sprint1Board](Sprint2Board.jpg)
++ ![Sprint2Board](Sprint2Board.jpg)
 
 ## [ÜRÜN DURUMU]
 + ![CrowAttack1](KargaSaldırılar.gif)
@@ -174,6 +174,39 @@ Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozk
   
 ### Act
 + Yeni sprint başlangıcında ilk iki gün bir önceki sprintte tamamlanamayan taskler halledilebilir, bug fix üzerine odaklanılabilir
+
+<br><br>
+
+# SPRINT.3
+
+## [SPRINT NOTLARI]
++ Sprint review ve retrospective toplantısının 03.08.2025 Pazar tarihinde yapılması planlanmıştır.
+
+## [SPRINT İÇİNDE TAMAMLANMASI HEDEFLENEN PUAN]
++ Sprint 3 için tamamlanması hedeflenen puan 33 olarak belirlenmiştir.
+
+## [PUAN TAMAMLAMA MANTIĞI]
++ Görevler (To-Do) listelendikten sonra hepsine kolaydan zora doğru 1, 2 ve 3 şeklinde rakamlar atanmıştır ve bu rakamlar tüm görevler için zorluk ifade eden birer "tag" haline gelmiştir.
++ Görevlere verilen "tag"lerin toplamı, sprint içerisinde tamamlanması hedeflenen puana dönüşmüştür.
+
+## [DAILY SCRUM]
++ Görüşmeler çoğunlukla Whatsapp üzerinden yapılmıştır.
++ Gerekli durumlarda Slack takım kanalımızda huddle toplantıları düzenlenmiştir.
++ [Daily Scrum Messages via Drive](https://drive.google.com/drive/u/0/folders/10LfuCgrbaLYTVLfsbcvQqqjbHifXQap7)
+
+## [SPRINT BOARD UPDATE]
+Sprint 3 Miro Board Screenshot
++ ![Sprint2Board](xxx.jpg)
+
+## [ÜRÜN DURUMU]
+
+## [SPRINT REVIEW]
+Toplantı katılımcıları: Seray Keskinkılınç, Yunus Emre Akyay, Beste Bozkurt
+
++ Bu sprint takımda genel bug fix yapılması, sahne tasarımda detaylandırmaları, ses/müzik entegrasyonu, UI tasarım ve kodlamaları, seviye ve zorluk akışının finalize edilmesi, ve teslime hazırlık şeklinde ilerlemiştir.
++ Sprint oldukça verimli geçmiştir. Sprintin ilk iki günü önceki sprintlerden kalan bug fixlere odaklanılmış ve bu gelecek taskler için hız kazandırmıştır.
++ Sprintte bazı optional extra tasks kolonundaki görevler dışındaki taskler tamamlanmıştır. Takım developerları oynanabilir seviyeyi bitirmiş ve çok iyi bir iş çıkarmıştır.
+
 
 # [FİNAL NOTLAR]
 Oyunumuzda çoğunlukla hazır assetler kullanıldı. Kullanılan assetlerin linklerine oyun raporumuzun en güncel halinden veya Miro içerisinde assete ait task açıklamasından ulaşabilirsiniz.
